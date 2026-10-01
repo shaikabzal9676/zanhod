@@ -15,7 +15,6 @@ dist/
 .env.production
 
 server/.env
-server/node_modules
 
 .DS_Store
 
