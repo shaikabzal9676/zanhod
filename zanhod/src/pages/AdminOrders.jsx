@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import {
   RefreshCw,
   Search,
@@ -17,20 +18,19 @@ import {
   CalendarDays,
   Hash,
 } from "lucide-react";
+
 import API_URL from "../config/api";
 import { useAdminAuth } from "../context/AdminAuthContext";
 
 import "../styles/admin-orders.css";
 
-
 function AdminOrders() {
-
   const {
-    token,
     admin,
     logout,
+    isAuthenticated,
+    loading: authLoading,
   } = useAdminAuth();
-
 
   /* =========================================================
      STATE
@@ -46,298 +46,292 @@ function AdminOrders() {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [statusFilter, setStatusFilter] =
-    useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
 
-  const [updatingOrder, setUpdatingOrder] =
-    useState(null);
+  const [updatingOrder, setUpdatingOrder] = useState(null);
 
-  
   const [currentPage, setCurrentPage] = useState(1);
 
-const [pagination, setPagination] = useState({
-  currentPage: 1,
-  itemsPerPage: 10,
-  totalOrders: 0,
-  totalPages: 0,
-  hasNextPage: false,
-  hasPreviousPage: false,
-});
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    itemsPerPage: 10,
+    totalOrders: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
 
-const [statistics, setStatistics] = useState({
-  totalOrders: 0,
-  paidOrders: 0,
-  pendingPayments: 0,
-  paidRevenue: 0,
-});
-
+  const [statistics, setStatistics] = useState({
+    totalOrders: 0,
+    paidOrders: 0,
+    pendingPayments: 0,
+    paidRevenue: 0,
+  });
 
   /* =========================================================
      ORDER DETAILS
   ========================================================= */
 
-  const [selectedOrder, setSelectedOrder] =
-    useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   const [orderDetailsLoading, setOrderDetailsLoading] =
     useState(false);
 
-  const [orderDetailsError, setOrderDetailsError] =
-    useState("");
-
+  const [orderDetailsError, setOrderDetailsError] = useState("");
 
   /* =========================================================
-     FETCH ALL ORDERS
+     FETCH ORDERS
   ========================================================= */
 
- const fetchOrders = async (
-  page = currentPage,
-  showRefreshLoader = false
-) => {
-  try {
-    setError("");
+  const fetchOrders = async (
+    page = currentPage,
+    showRefreshLoader = false
+  ) => {
+    try {
+      setError("");
 
-    if (showRefreshLoader) {
-      setRefreshing(true);
-    } else {
-      setLoading(true);
-    }
-
-    const params = new URLSearchParams();
-
-    params.set("page", page);
-    params.set("limit", "10");
-
-    if (searchTerm.trim()) {
-      params.set(
-        "search",
-        searchTerm.trim()
-      );
-    }
-
-    if (statusFilter !== "all") {
-      params.set(
-        "status",
-        statusFilter
-      );
-    }
-
-    const response = await fetch(
-      `${API_URL}/api/orders/admin/all?${params.toString()}`,
-      {
-        method: "GET",
-        
-
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials:"include",
+      if (showRefreshLoader) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
       }
-    );
 
-    const data = await response.json();
+      const params = new URLSearchParams();
 
-    if (response.status === 401) {
-      logout();
-      return;
-    }
+      params.set("page", String(page));
+      params.set("limit", "10");
 
-    if (!response.ok || !data.success) {
-      throw new Error(
-        data.message ||
-          "Failed to load orders"
-      );
-    }
-
-    setOrders(data.orders || []);
-
-    setStatistics(
-  data.statistics || {
-    totalOrders: 0,
-    paidOrders: 0,
-    pendingPayments: 0,
-    paidRevenue: 0,
-  }
-);
-
-    setPagination(
-      data.pagination || {
-        currentPage: page,
-        itemsPerPage: 10,
-        totalOrders: 0,
-        totalPages: 0,
-        hasNextPage: false,
-        hasPreviousPage: false,
+      if (searchTerm.trim()) {
+        params.set("search", searchTerm.trim());
       }
-    );
 
-    setCurrentPage(
-      data.pagination?.currentPage || page
-    );
+      if (statusFilter !== "all") {
+        params.set("status", statusFilter);
+      }
 
-  } catch (error) {
+      const response = await fetch(
+        `${API_URL}/api/orders/admin/all?${params.toString()}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
-    console.error(
-      "Fetch orders error:",
-      error
-    );
+      const data = await response.json();
 
-    setError(
-      error.message ||
-        "Unable to load orders. Please try again."
-    );
+      if (response.status === 401) {
+        await logout();
+        return;
+      }
 
-  } finally {
-    setLoading(false);
-    setRefreshing(false);
-  }
-};
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.message || "Failed to load orders"
+        );
+      }
 
+      setOrders(data.orders || []);
+
+      setStatistics(
+        data.statistics || {
+          totalOrders: 0,
+          paidOrders: 0,
+          pendingPayments: 0,
+          paidRevenue: 0,
+        }
+      );
+
+      setPagination(
+        data.pagination || {
+          currentPage: page,
+          itemsPerPage: 10,
+          totalOrders: 0,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        }
+      );
+
+      setCurrentPage(
+        data.pagination?.currentPage || page
+      );
+    } catch (error) {
+      console.error("Fetch orders error:", error);
+
+      setError(
+        error.message ||
+          "Unable to load orders. Please try again."
+      );
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   /* =========================================================
-     INITIAL LOAD
+     INITIAL LOAD + PAGE CHANGE
   ========================================================= */
 
   useEffect(() => {
-  if (token) {
-    fetchOrders(
-      currentPage,
-      false
-    );
-  }
-}, [
-  token,
-  currentPage,
-]);
+    if (authLoading) {
+      return;
+    }
 
+    if (!isAuthenticated) {
+      setLoading(false);
+      return;
+    }
+
+    fetchOrders(currentPage, false);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    authLoading,
+    isAuthenticated,
+    currentPage,
+  ]);
+
+  /* =========================================================
+     SEARCH + FILTER
+  ========================================================= */
+
+  useEffect(() => {
+    if (authLoading || !isAuthenticated) {
+      return;
+    }
+
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+      return;
+    }
+
+    fetchOrders(1, false);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    searchTerm,
+    statusFilter,
+    authLoading,
+    isAuthenticated,
+  ]);
 
   /* =========================================================
      UPDATE ORDER STATUS
   ========================================================= */
 
- const updateOrderStatus = async (
-  orderNumber,
-  newStatus
-) => {
-  try {
-    setError("");
-    setUpdatingOrder(orderNumber);
+  const updateOrderStatus = async (
+    orderNumber,
+    newStatus
+  ) => {
+    try {
+      setError("");
 
-    const response = await fetch(
-      `${API_URL}/api/orders/admin/${encodeURIComponent(
-        orderNumber
-      )}/status`,
-      {
-        method: "PATCH",
-        
+      setUpdatingOrder(orderNumber);
 
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await fetch(
+        `${API_URL}/api/orders/admin/${encodeURIComponent(
+          orderNumber
+        )}/status`,
+        {
+          method: "PATCH",
 
-        credentials:"include",
+          headers: {
+            "Content-Type": "application/json",
+          },
 
-        body: JSON.stringify({
-          orderStatus: newStatus,
-        }),
-      }
-    );
+          credentials: "include",
 
-    const data = await response.json();
-
-    if (response.status === 401) {
-      logout();
-      return;
-    }
-
-    if (!response.ok || !data.success) {
-      throw new Error(
-        data.message ||
-          "Failed to update order status"
+          body: JSON.stringify({
+            orderStatus: newStatus,
+          }),
+        }
       );
-    }
 
-    /* =========================================
-       UPDATE ORDER IN TABLE
-    ========================================= */
+      const data = await response.json();
 
-    setOrders((currentOrders) =>
-      currentOrders.map((order) =>
-        order.orderNumber === orderNumber
-          ? {
-              ...order,
-
-              orderStatus:
-                data.order.orderStatus,
-
-              statusHistory:
-                data.order.statusHistory ||
-                order.statusHistory ||
-                [],
-            }
-          : order
-      )
-    );
-
-    /* =========================================
-       UPDATE OPEN ORDER DETAILS
-    ========================================= */
-
-    setSelectedOrder((currentOrder) => {
-      if (
-        !currentOrder ||
-        currentOrder.orderNumber !== orderNumber
-      ) {
-        return currentOrder;
+      if (response.status === 401) {
+        await logout();
+        return;
       }
 
-      return {
-        ...currentOrder,
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.message ||
+            "Failed to update order status"
+        );
+      }
 
-        orderStatus:
-          data.order.orderStatus,
+      /* =========================================
+         UPDATE ORDER IN TABLE
+      ========================================= */
 
-        statusHistory:
-          data.order.statusHistory ||
-          currentOrder.statusHistory ||
-          [],
-      };
-    });
+      setOrders((currentOrders) =>
+        currentOrders.map((order) =>
+          order.orderNumber === orderNumber
+            ? {
+                ...order,
+                orderStatus:
+                  data.order.orderStatus,
 
-  } catch (error) {
-    console.error(
-      "Update order status error:",
-      error
-    );
+                statusHistory:
+                  data.order.statusHistory ||
+                  order.statusHistory ||
+                  [],
+              }
+            : order
+        )
+      );
 
-    setError(
-      error.message ||
-        "Unable to update order status."
-    );
+      /* =========================================
+         UPDATE OPEN ORDER DETAILS
+      ========================================= */
 
-  } finally {
-    setUpdatingOrder(null);
-  }
-};
+      setSelectedOrder((currentOrder) => {
+        if (
+          !currentOrder ||
+          currentOrder.orderNumber !== orderNumber
+        ) {
+          return currentOrder;
+        }
+
+        return {
+          ...currentOrder,
+
+          orderStatus:
+            data.order.orderStatus,
+
+          statusHistory:
+            data.order.statusHistory ||
+            currentOrder.statusHistory ||
+            [],
+        };
+      });
+    } catch (error) {
+      console.error(
+        "Update order status error:",
+        error
+      );
+
+      setError(
+        error.message ||
+          "Unable to update order status."
+      );
+    } finally {
+      setUpdatingOrder(null);
+    }
+  };
 
   /* =========================================================
      OPEN ORDER DETAILS
   ========================================================= */
 
-  const openOrderDetails = async (
-    order
-  ) => {
-
+  const openOrderDetails = async (order) => {
     try {
-
-      /* Show existing order immediately */
       setSelectedOrder(order);
 
       setOrderDetailsLoading(true);
 
       setOrderDetailsError("");
-
 
       const response = await fetch(
         `${API_URL}/api/orders/admin/${encodeURIComponent(
@@ -345,127 +339,70 @@ const [statistics, setStatistics] = useState({
         )}`,
         {
           method: "GET",
-
-
-          headers: {
-            Authorization:
-              `Bearer ${token}`,
-          },
-          credentials:"include",
+          credentials: "include",
         }
       );
 
-
-      const data =
-        await response.json();
-
+      const data = await response.json();
 
       if (response.status === 401) {
-        logout();
+        await logout();
         return;
       }
 
-
-      if (
-        !response.ok ||
-        !data.success
-      ) {
-
+      if (!response.ok || !data.success) {
         throw new Error(
           data.message ||
             "Failed to load order details"
         );
-
       }
 
-
-      setSelectedOrder(
-        data.order
-      );
-
-
+      setSelectedOrder(data.order);
     } catch (error) {
-
       console.error(
         "Order details error:",
         error
       );
 
-
       setOrderDetailsError(
         error.message ||
           "Unable to load order details."
       );
-
     } finally {
-
       setOrderDetailsLoading(false);
-
     }
-
   };
-
 
   /* =========================================================
      CLOSE ORDER DETAILS
   ========================================================= */
 
   const closeOrderDetails = () => {
-
     setSelectedOrder(null);
-
     setOrderDetailsError("");
-
   };
-
-
-  /* =========================================================
-     FILTER ORDERS
-  ========================================================= */
-
-  useEffect(() => {
-  if (!token) {
-    return;
-  }
-
-  if (currentPage !== 1) {
-    setCurrentPage(1);
-    return;
-  }
-
-  fetchOrders(1);
-}, [
-  searchTerm,
-  statusFilter,
-]);
-
 
   /* =========================================================
      DASHBOARD STATISTICS
   ========================================================= */
 
-const {
-  totalOrders,
-  paidOrders,
-  pendingPayments,
-  paidRevenue,
-} = statistics;
-
+  const {
+    totalOrders,
+    paidOrders,
+    pendingPayments,
+    paidRevenue,
+  } = statistics;
 
   /* =========================================================
      FORMAT DATE
   ========================================================= */
 
   const formatDate = (date) => {
-
     if (!date) {
       return "—";
     }
 
-
-    return new Date(
-      date
-    ).toLocaleDateString(
+    return new Date(date).toLocaleDateString(
       "en-IN",
       {
         day: "2-digit",
@@ -473,86 +410,78 @@ const {
         year: "numeric",
       }
     );
-
   };
-
 
   /* =========================================================
      FORMAT TIME
   ========================================================= */
 
   const formatTime = (date) => {
-
     if (!date) {
       return "";
     }
 
-
-    return new Date(
-      date
-    ).toLocaleTimeString(
+    return new Date(date).toLocaleTimeString(
       "en-IN",
       {
         hour: "2-digit",
         minute: "2-digit",
       }
     );
-
   };
 
+  /* =========================================================
+     FORMAT STATUS
+  ========================================================= */
+
+  const formatStatus = (status) => {
+    if (!status) {
+      return "UNKNOWN";
+    }
+
+    return status.replace(
+      /^./,
+      (letter) => letter.toUpperCase()
+    );
+  };
 
   /* =========================================================
      STATUS CLASS
   ========================================================= */
 
-  const getStatusClass =
-    (status) => {
-
-      return (
-        status
-          ?.toLowerCase()
-          .replace(/\s+/g, "-") ||
-        "unknown"
-      );
-
-    };
-
+  const getStatusClass = (status) => {
+    return (
+      status
+        ?.toLowerCase()
+        .replace(/\s+/g, "-") ||
+      "unknown"
+    );
+  };
 
   /* =========================================================
      LOADING STATE
   ========================================================= */
 
-  if (loading) {
-
+  if (authLoading || loading) {
     return (
-
       <main className="admin-orders-page">
-
         <div className="admin-loading">
-
           <div className="admin-loading-spinner"></div>
 
           <p>
             LOADING ORDERS...
           </p>
-
         </div>
-
       </main>
-
     );
-
   }
-
 
   /* =========================================================
      PAGE
   ========================================================= */
 
   return (
-
     <main className="admin-orders-page">
-
 
       {/* =====================================================
           HEADER
@@ -580,7 +509,6 @@ const {
 
         </div>
 
-
         <div className="admin-header-right">
 
           <div className="admin-user">
@@ -592,31 +520,25 @@ const {
               </span>
 
               <strong>
-                {admin?.name ||
-                  "ADMIN"}
+                {admin?.name || "ADMIN"}
               </strong>
 
             </div>
 
           </div>
 
-
           <button
             type="button"
             className="admin-logout-button"
             onClick={logout}
           >
-
             <LogOut size={16} />
-
             LOGOUT
-
           </button>
 
         </div>
 
       </header>
-
 
       {/* =====================================================
           DASHBOARD TOP BAR
@@ -636,12 +558,11 @@ const {
 
         </div>
 
-
         <button
           type="button"
           className="admin-refresh-button"
           onClick={() =>
-            fetchOrders(true)
+            fetchOrders(currentPage, true)
           }
           disabled={refreshing}
         >
@@ -663,13 +584,11 @@ const {
 
       </section>
 
-
       {/* =====================================================
           ERROR
       ===================================================== */}
 
       {error && (
-
         <div className="admin-error">
 
           <span>
@@ -686,16 +605,13 @@ const {
           </button>
 
         </div>
-
       )}
-
 
       {/* =====================================================
           STATISTICS
       ===================================================== */}
 
       <section className="admin-stats">
-
 
         <div className="admin-stat-card">
 
@@ -717,7 +633,6 @@ const {
 
         </div>
 
-
         <div className="admin-stat-card">
 
           <div className="admin-stat-icon">
@@ -737,7 +652,6 @@ const {
           </div>
 
         </div>
-
 
         <div className="admin-stat-card">
 
@@ -759,7 +673,6 @@ const {
 
         </div>
 
-
         <div className="admin-stat-card">
 
           <div className="admin-stat-icon">
@@ -774,7 +687,9 @@ const {
 
             <strong>
               ₹
-              {paidRevenue.toLocaleString("en-IN")}
+              {paidRevenue.toLocaleString(
+                "en-IN"
+              )}
             </strong>
 
           </div>
@@ -783,13 +698,11 @@ const {
 
       </section>
 
-
       {/* =====================================================
           SEARCH + FILTER
       ===================================================== */}
 
       <section className="admin-filters">
-
 
         <div className="admin-search">
 
@@ -807,7 +720,6 @@ const {
           />
 
         </div>
-
 
         <div className="admin-status-filter">
 
@@ -856,7 +768,6 @@ const {
 
       </section>
 
-
       {/* =====================================================
           RESULTS INFO
       ===================================================== */}
@@ -864,15 +775,16 @@ const {
       <div className="admin-results-bar">
 
         <span>
-
-         SHOWING{" "}
-{orders.length}{" "}
-OF{" "}
-{pagination.totalOrders}{" "}
-ORDERS
-
+          SHOWING{" "}
+          <strong>
+            {orders.length}
+          </strong>{" "}
+          OF{" "}
+          <strong>
+            {pagination.totalOrders}
+          </strong>{" "}
+          ORDERS
         </span>
-
 
         {(searchTerm ||
           statusFilter !== "all") && (
@@ -880,13 +792,8 @@ ORDERS
           <button
             type="button"
             onClick={() => {
-
               setSearchTerm("");
-
-              setStatusFilter(
-                "all"
-              );
-
+              setStatusFilter("all");
             }}
           >
             CLEAR FILTERS
@@ -895,7 +802,6 @@ ORDERS
         )}
 
       </div>
-
 
       {/* =====================================================
           ORDERS
@@ -912,11 +818,7 @@ ORDERS
           </h3>
 
           <p>
-
-            {orders.length === 0
-              ? "Orders will appear here after customers complete checkout."
-              : "Try changing your search or status filter."}
-
+            Orders will appear here after customers complete checkout.
           </p>
 
         </section>
@@ -924,7 +826,6 @@ ORDERS
       ) : (
 
         <section className="admin-orders-container">
-
 
           {/* =================================================
               DESKTOP TABLE
@@ -970,295 +871,233 @@ ORDERS
 
               </thead>
 
-
               <tbody>
 
-                {orders.map(
-                  (order) => (
+                {orders.map((order) => (
 
-                    <tr
-                      key={
-                        order._id ||
-                        order.orderNumber
-                      }
-                      className="admin-order-row"
-                      onClick={() =>
-                        openOrderDetails(
-                          order
-                        )
-                      }
-                    >
+                  <tr
+                    key={
+                      order._id ||
+                      order.orderNumber
+                    }
+                    className="admin-order-row"
+                    onClick={() =>
+                      openOrderDetails(order)
+                    }
+                  >
 
+                    {/* ORDER */}
 
-                      {/* ORDER */}
+                    <td>
 
-                      <td>
+                      <div className="order-number">
+                        {order.orderNumber}
+                      </div>
 
-                        <div className="order-number">
-
-                          {order.orderNumber}
-
+                      {order.razorpayOrderId && (
+                        <div className="order-razorpay-id">
+                          {order.razorpayOrderId}
                         </div>
+                      )}
 
+                    </td>
 
-                        {order.razorpayOrderId && (
+                    {/* CUSTOMER */}
 
-                          <div className="order-razorpay-id">
+                    <td>
 
-                            {
-                              order.razorpayOrderId
-                            }
+                      <div className="customer-cell">
 
-                          </div>
+                        <strong>
+                          {order.customer?.name ||
+                            "—"}
+                        </strong>
 
-                        )}
+                        <span>
+                          {order.customer?.email ||
+                            "—"}
+                        </span>
 
-                      </td>
+                        <span>
+                          {order.customer?.phone ||
+                            "—"}
+                        </span>
 
+                      </div>
 
-                      {/* CUSTOMER */}
+                    </td>
 
-                      <td>
+                    {/* ITEMS */}
 
-                        <div className="customer-cell">
+                    <td>
 
-                          <strong>
-                            {
-                              order.customer
-                                ?.name ||
-                              "—"
-                            }
-                          </strong>
+                      <div className="order-items-cell">
 
-                          <span>
-                            {
-                              order.customer
-                                ?.email ||
-                              "—"
-                            }
-                          </span>
+                        {order.items?.map(
+                          (item, index) => (
 
-                          <span>
-                            {
-                              order.customer
-                                ?.phone ||
-                              "—"
-                            }
-                          </span>
+                            <div
+                              className="order-item"
+                              key={`${item.productId}-${item.size}-${index}`}
+                            >
 
-                        </div>
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                              />
 
-                      </td>
+                              <div>
 
+                                <strong>
+                                  {item.name}
+                                </strong>
 
-                      {/* ITEMS */}
-
-                      <td>
-
-                        <div className="order-items-cell">
-
-                          {order.items?.map(
-                            (
-                              item,
-                              index
-                            ) => (
-
-                              <div
-                                className="order-item"
-                                key={`${item.productId}-${item.size}-${index}`}
-                              >
-
-                                <img
-                                  src={
-                                    item.image
-                                  }
-                                  alt={
-                                    item.name
-                                  }
-                                />
-
-                                <div>
-
-                                  <strong>
-                                    {
-                                      item.name
-                                    }
-                                  </strong>
-
-                                  <span>
-                                    {
-                                      item.size
-                                    }{" "}
-                                    ×{" "}
-                                    {
-                                      item.quantity
-                                    }
-                                  </span>
-
-                                </div>
+                                <span>
+                                  {item.size} ×{" "}
+                                  {item.quantity}
+                                </span>
 
                               </div>
 
-                            )
-                          )}
+                            </div>
 
-                        </div>
-
-                      </td>
-
-
-                      {/* TOTAL */}
-
-                      <td>
-
-                        <strong className="order-total">
-
-                          ₹
-                          {Number(
-                            order.total ||
-                              0
-                          ).toLocaleString(
-                            "en-IN"
-                          )}
-
-                        </strong>
-
-                      </td>
-
-
-                      {/* PAYMENT */}
-
-                      <td>
-
-                        <span
-                          className={`payment-badge ${getStatusClass(
-                            order.paymentStatus
-                          )}`}
-                        >
-
-                          {
-                            order.paymentStatus ||
-                            "UNKNOWN"
-                          }
-
-                        </span>
-
-
-                        {order.razorpayPaymentId && (
-
-                          <span className="payment-id">
-
-                            {
-                              order.razorpayPaymentId
-                            }
-
-                          </span>
-
+                          )
                         )}
 
-                      </td>
+                      </div>
 
+                    </td>
 
-                      {/* STATUS */}
+                    {/* TOTAL */}
 
-                      <td
-                        onClick={(event) =>
-                          event.stopPropagation()
-                        }
+                    <td>
+
+                      <strong className="order-total">
+
+                        ₹
+                        {Number(
+                          order.total || 0
+                        ).toLocaleString(
+                          "en-IN"
+                        )}
+
+                      </strong>
+
+                    </td>
+
+                    {/* PAYMENT */}
+
+                    <td>
+
+                      <span
+                        className={`payment-badge ${getStatusClass(
+                          order.paymentStatus
+                        )}`}
                       >
+                        {order.paymentStatus ||
+                          "UNKNOWN"}
+                      </span>
 
-                        <div className="status-control">
+                      {order.razorpayPaymentId && (
+                        <span className="payment-id">
+                          {order.razorpayPaymentId}
+                        </span>
+                      )}
 
-                          <select
-                            value={
-                              order.orderStatus ||
-                              "placed"
-                            }
-                            disabled={
-                              updatingOrder ===
-                              order.orderNumber
-                            }
-                            className={`order-status-select ${getStatusClass(
-                              order.orderStatus
-                            )}`}
-                            onChange={(
-                              event
-                            ) =>
-                              updateOrderStatus(
-                                order.orderNumber,
-                                event.target
-                                  .value
-                              )
-                            }
-                          >
+                    </td>
 
-                            <option value="placed">
-                              PLACED
-                            </option>
+                    {/* STATUS */}
 
-                            <option value="confirmed">
-                              CONFIRMED
-                            </option>
+                    <td
+                      onClick={(event) =>
+                        event.stopPropagation()
+                      }
+                    >
 
-                            <option value="processing">
-                              PROCESSING
-                            </option>
+                      <div className="status-control">
 
-                            <option value="shipped">
-                              SHIPPED
-                            </option>
+                        <select
+                          value={
+                            order.orderStatus ||
+                            "placed"
+                          }
+                          disabled={
+                            updatingOrder ===
+                            order.orderNumber
+                          }
+                          className={`order-status-select ${getStatusClass(
+                            order.orderStatus
+                          )}`}
+                          onChange={(event) =>
+                            updateOrderStatus(
+                              order.orderNumber,
+                              event.target.value
+                            )
+                          }
+                        >
 
-                            <option value="delivered">
-                              DELIVERED
-                            </option>
+                          <option value="placed">
+                            PLACED
+                          </option>
 
-                            <option value="cancelled">
-                              CANCELLED
-                            </option>
+                          <option value="confirmed">
+                            CONFIRMED
+                          </option>
 
-                          </select>
+                          <option value="processing">
+                            PROCESSING
+                          </option>
 
+                          <option value="shipped">
+                            SHIPPED
+                          </option>
 
-                          {updatingOrder ===
-                            order.orderNumber && (
+                          <option value="delivered">
+                            DELIVERED
+                          </option>
 
-                            <span className="status-saving">
-                              SAVING...
-                            </span>
+                          <option value="cancelled">
+                            CANCELLED
+                          </option>
 
-                          )}
+                        </select>
 
-                        </div>
-
-                      </td>
-
-
-                      {/* DATE */}
-
-                      <td>
-
-                        <div className="order-date">
-
-                          <strong>
-                            {formatDate(
-                              order.createdAt
-                            )}
-                          </strong>
-
-                          <span>
-                            {formatTime(
-                              order.createdAt
-                            )}
+                        {updatingOrder ===
+                          order.orderNumber && (
+                          <span className="status-saving">
+                            SAVING...
                           </span>
+                        )}
 
-                        </div>
+                      </div>
 
-                      </td>
+                    </td>
 
-                    </tr>
+                    {/* DATE */}
 
-                  )
-                )}
+                    <td>
+
+                      <div className="order-date">
+
+                        <strong>
+                          {formatDate(
+                            order.createdAt
+                          )}
+                        </strong>
+
+                        <span>
+                          {formatTime(
+                            order.createdAt
+                          )}
+                        </span>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                ))}
 
               </tbody>
 
@@ -1266,247 +1105,201 @@ ORDERS
 
           </div>
 
-
           {/* =================================================
               MOBILE ORDER CARDS
           ================================================= */}
 
           <div className="admin-mobile-orders">
 
-            {orders.map(
-              (order) => (
+            {orders.map((order) => (
 
-                <article
-                  className="admin-mobile-order"
-                  key={`mobile-${
-                    order._id ||
-                    order.orderNumber
-                  }`}
-                  onClick={() =>
-                    openOrderDetails(
-                      order
-                    )
-                  }
-                >
+              <article
+                className="admin-mobile-order"
+                key={`mobile-${
+                  order._id ||
+                  order.orderNumber
+                }`}
+                onClick={() =>
+                  openOrderDetails(order)
+                }
+              >
 
+                <div className="mobile-order-top">
 
-                  <div className="mobile-order-top">
+                  <div>
 
-                    <div>
-
-                      <span>
-                        ORDER
-                      </span>
-
-                      <strong>
-                        {
-                          order.orderNumber
-                        }
-                      </strong>
-
-                    </div>
-
-
-                    <div className="mobile-order-total">
-
-                      ₹
-                      {Number(
-                        order.total ||
-                          0
-                      ).toLocaleString(
-                        "en-IN"
-                      )}
-
-                    </div>
-
-                  </div>
-
-
-                  <div className="mobile-order-customer">
+                    <span>
+                      ORDER
+                    </span>
 
                     <strong>
-                      {
-                        order.customer
-                          ?.name ||
-                        "—"
-                      }
+                      {order.orderNumber}
                     </strong>
-
-                    <span>
-                      {
-                        order.customer
-                          ?.email ||
-                        "—"
-                      }
-                    </span>
-
-                    <span>
-                      {
-                        order.customer
-                          ?.phone ||
-                        "—"
-                      }
-                    </span>
 
                   </div>
 
+                  <div className="mobile-order-total">
 
-                  <div className="mobile-order-items">
-
-                    {order.items?.map(
-                      (
-                        item,
-                        index
-                      ) => (
-
-                        <div
-                          className="mobile-order-item"
-                          key={`${item.productId}-${item.size}-${index}`}
-                        >
-
-                          <img
-                            src={
-                              item.image
-                            }
-                            alt={
-                              item.name
-                            }
-                          />
-
-                          <div>
-
-                            <strong>
-                              {
-                                item.name
-                              }
-                            </strong>
-
-                            <span>
-                              Size{" "}
-                              {
-                                item.size
-                              }{" "}
-                              · Qty{" "}
-                              {
-                                item.quantity
-                              }
-                            </span>
-
-                          </div>
-
-                        </div>
-
-                      )
+                    ₹
+                    {Number(
+                      order.total || 0
+                    ).toLocaleString(
+                      "en-IN"
                     )}
 
                   </div>
 
+                </div>
 
-                  <div className="mobile-order-meta">
+                <div className="mobile-order-customer">
 
+                  <strong>
+                    {order.customer?.name ||
+                      "—"}
+                  </strong>
 
-                    <div>
+                  <span>
+                    {order.customer?.email ||
+                      "—"}
+                  </span>
 
-                      <span>
-                        PAYMENT
-                      </span>
+                  <span>
+                    {order.customer?.phone ||
+                      "—"}
+                  </span>
 
-                      <strong
-                        className={`payment-badge ${getStatusClass(
-                          order.paymentStatus
-                        )}`}
+                </div>
+
+                <div className="mobile-order-items">
+
+                  {order.items?.map(
+                    (item, index) => (
+
+                      <div
+                        className="mobile-order-item"
+                        key={`${item.productId}-${item.size}-${index}`}
                       >
 
-                        {
-                          order.paymentStatus
-                        }
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                        />
 
-                      </strong>
+                        <div>
 
-                    </div>
+                          <strong>
+                            {item.name}
+                          </strong>
 
+                          <span>
+                            Size{" "}
+                            {item.size} · Qty{" "}
+                            {item.quantity}
+                          </span>
 
-                    <div>
+                        </div>
 
-                      <span>
-                        DATE
-                      </span>
+                      </div>
 
-                      <strong>
-                        {formatDate(
-                          order.createdAt
-                        )}
-                      </strong>
+                    )
+                  )}
 
-                    </div>
+                </div>
+
+                <div className="mobile-order-meta">
+
+                  <div>
+
+                    <span>
+                      PAYMENT
+                    </span>
+
+                    <strong
+                      className={`payment-badge ${getStatusClass(
+                        order.paymentStatus
+                      )}`}
+                    >
+                      {order.paymentStatus ||
+                        "UNKNOWN"}
+                    </strong>
 
                   </div>
 
+                  <div>
 
-                  <div
-                    className="mobile-order-status"
-                    onClick={(event) =>
-                      event.stopPropagation()
+                    <span>
+                      DATE
+                    </span>
+
+                    <strong>
+                      {formatDate(
+                        order.createdAt
+                      )}
+                    </strong>
+
+                  </div>
+
+                </div>
+
+                <div
+                  className="mobile-order-status"
+                  onClick={(event) =>
+                    event.stopPropagation()
+                  }
+                >
+
+                  <label>
+                    ORDER STATUS
+                  </label>
+
+                  <select
+                    value={
+                      order.orderStatus ||
+                      "placed"
+                    }
+                    disabled={
+                      updatingOrder ===
+                      order.orderNumber
+                    }
+                    onChange={(event) =>
+                      updateOrderStatus(
+                        order.orderNumber,
+                        event.target.value
+                      )
                     }
                   >
 
-                    <label>
-                      ORDER STATUS
-                    </label>
+                    <option value="placed">
+                      PLACED
+                    </option>
 
+                    <option value="confirmed">
+                      CONFIRMED
+                    </option>
 
-                    <select
-                      value={
-                        order.orderStatus ||
-                        "placed"
-                      }
-                      disabled={
-                        updatingOrder ===
-                        order.orderNumber
-                      }
-                      onChange={(
-                        event
-                      ) =>
-                        updateOrderStatus(
-                          order.orderNumber,
-                          event.target
-                            .value
-                        )
-                      }
-                    >
+                    <option value="processing">
+                      PROCESSING
+                    </option>
 
-                      <option value="placed">
-                        PLACED
-                      </option>
+                    <option value="shipped">
+                      SHIPPED
+                    </option>
 
-                      <option value="confirmed">
-                        CONFIRMED
-                      </option>
+                    <option value="delivered">
+                      DELIVERED
+                    </option>
 
-                      <option value="processing">
-                        PROCESSING
-                      </option>
+                    <option value="cancelled">
+                      CANCELLED
+                    </option>
 
-                      <option value="shipped">
-                        SHIPPED
-                      </option>
+                  </select>
 
-                      <option value="delivered">
-                        DELIVERED
-                      </option>
+                </div>
 
-                      <option value="cancelled">
-                        CANCELLED
-                      </option>
+              </article>
 
-                    </select>
-
-                  </div>
-
-                </article>
-
-              )
-            )}
+            ))}
 
           </div>
 
@@ -1514,78 +1307,76 @@ ORDERS
 
       )}
 
-
       {/* =========================================================
-    PAGINATION
-========================================================= */}
+          PAGINATION
+      ========================================================= */}
 
-{pagination.totalPages > 1 && (
-  <div className="admin-pagination">
+      {pagination.totalPages > 1 && (
 
-    <button
-      type="button"
-      className="pagination-button"
-      onClick={() =>
-        setCurrentPage(
-          (page) => page - 1
-        )
-      }
-      disabled={
-        !pagination.hasPreviousPage
-      }
-    >
-      ← PREVIOUS
-    </button>
+        <div className="admin-pagination">
 
+          <button
+            type="button"
+            className="pagination-button"
+            onClick={() =>
+              setCurrentPage(
+                (page) => page - 1
+              )
+            }
+            disabled={
+              !pagination.hasPreviousPage
+            }
+          >
+            ← PREVIOUS
+          </button>
 
-    <div className="pagination-pages">
+          <div className="pagination-pages">
 
-      {Array.from(
-        {
-          length:
-            pagination.totalPages,
-        },
-        (_, index) => index + 1
-      ).map((page) => (
+            {Array.from(
+              {
+                length:
+                  pagination.totalPages,
+              },
+              (_, index) => index + 1
+            ).map((page) => (
 
-        <button
-          key={page}
-          type="button"
-          className={`pagination-page ${
-            currentPage === page
-              ? "active"
-              : ""
-          }`}
-          onClick={() =>
-            setCurrentPage(page)
-          }
-        >
-          {page}
-        </button>
+              <button
+                key={page}
+                type="button"
+                className={`pagination-page ${
+                  currentPage === page
+                    ? "active"
+                    : ""
+                }`}
+                onClick={() =>
+                  setCurrentPage(page)
+                }
+              >
+                {page}
+              </button>
 
-      ))}
+            ))}
 
-    </div>
+          </div>
 
+          <button
+            type="button"
+            className="pagination-button"
+            onClick={() =>
+              setCurrentPage(
+                (page) => page + 1
+              )
+            }
+            disabled={
+              !pagination.hasNextPage
+            }
+          >
+            NEXT →
+          </button>
 
-    <button
-      type="button"
-      className="pagination-button"
-      onClick={() =>
-        setCurrentPage(
-          (page) => page + 1
-        )
-      }
-      disabled={
-        !pagination.hasNextPage
-      }
-    >
-      NEXT →
-    </button>
+        </div>
 
-  </div>
-)}
-
+      )}
 
       {/* =====================================================
           ORDER DETAILS DRAWER
@@ -1605,7 +1396,6 @@ ORDERS
             }
           >
 
-
             {/* HEADER */}
 
             <div className="order-details-header">
@@ -1617,36 +1407,25 @@ ORDERS
                 </p>
 
                 <h2>
-                  {
-                    selectedOrder.orderNumber
-                  }
+                  {selectedOrder.orderNumber}
                 </h2>
 
               </div>
 
-
               <button
                 type="button"
                 className="order-details-close"
-                onClick={
-                  closeOrderDetails
-                }
+                onClick={closeOrderDetails}
                 aria-label="Close order details"
               >
-
                 <X size={20} />
-
               </button>
 
             </div>
 
-
             {/* BODY */}
 
             <div className="order-details-body">
-
-
-              {/* LOADING */}
 
               {orderDetailsLoading ? (
 
@@ -1660,18 +1439,12 @@ ORDERS
 
                 </div>
 
-
               ) : orderDetailsError ? (
-
-
-                /* ERROR */
 
                 <div className="order-details-error">
 
                   <p>
-                    {
-                      orderDetailsError
-                    }
+                    {orderDetailsError}
                   </p>
 
                   <button
@@ -1687,14 +1460,9 @@ ORDERS
 
                 </div>
 
-
               ) : (
 
-
-                /* DETAILS */
-
                 <>
-
 
                   {/* =================================================
                       STATUS
@@ -1713,21 +1481,18 @@ ORDERS
                           selectedOrder.orderStatus
                         )}`}
                       >
-                        {
-                          selectedOrder.orderStatus ||
-                          "UNKNOWN"
-                        }
+                        {formatStatus(
+                          selectedOrder.orderStatus
+                        )}
                       </span>
 
                     </div>
-
 
                     <div className="details-status-control">
 
                       <label>
                         UPDATE STATUS
                       </label>
-
 
                       <select
                         value={
@@ -1738,13 +1503,10 @@ ORDERS
                           updatingOrder ===
                           selectedOrder.orderNumber
                         }
-                        onChange={(
-                          event
-                        ) =>
+                        onChange={(event) =>
                           updateOrderStatus(
                             selectedOrder.orderNumber,
-                            event.target
-                              .value
+                            event.target.value
                           )
                         }
                       >
@@ -1779,6 +1541,117 @@ ORDERS
 
                   </section>
 
+                  {/* =================================================
+                      STATUS HISTORY
+                  ================================================= */}
+
+                  <section className="details-block">
+
+                    <div className="details-block-title">
+
+                      <Clock3 size={15} />
+
+                      <h3>
+                        STATUS HISTORY
+                      </h3>
+
+                    </div>
+
+                    {selectedOrder.statusHistory &&
+                    selectedOrder.statusHistory.length >
+                      0 ? (
+
+                      <div className="status-history">
+
+                        {[
+                          ...selectedOrder.statusHistory,
+                        ]
+                          .reverse()
+                          .map(
+                            (
+                              history,
+                              index
+                            ) => (
+
+                              <div
+                                className={`status-history-item ${
+                                  index === 0
+                                    ? "current"
+                                    : ""
+                                }`}
+                                key={`${history.status}-${history.changedAt}-${index}`}
+                              >
+
+                                <div className="status-history-marker">
+                                  <span></span>
+                                </div>
+
+                                <div className="status-history-content">
+
+                                  <div className="status-history-top">
+
+                                    <strong>
+                                      {formatStatus(
+                                        history.status
+                                      )}
+                                    </strong>
+
+                                    {index ===
+                                      0 && (
+                                      <span className="status-history-current">
+                                        CURRENT
+                                      </span>
+                                    )}
+
+                                  </div>
+
+                                  <p>
+                                    {history.note ||
+                                      `Order status changed to ${history.status}`}
+                                  </p>
+
+                                  <time>
+                                    {history.changedAt
+                                      ? new Date(
+                                          history.changedAt
+                                        ).toLocaleString(
+                                          "en-IN",
+                                          {
+                                            day: "2-digit",
+                                            month: "short",
+                                            year: "numeric",
+                                            hour: "2-digit",
+                                            minute:
+                                              "2-digit",
+                                          }
+                                        )
+                                      : "—"}
+                                  </time>
+
+                                </div>
+
+                              </div>
+
+                            )
+                          )}
+
+                      </div>
+
+                    ) : (
+
+                      <div className="status-history-empty">
+
+                        <Clock3 size={18} />
+
+                        <p>
+                          No status history available
+                        </p>
+
+                      </div>
+
+                    )}
+
+                  </section>
 
                   {/* =================================================
                       CUSTOMER
@@ -1796,9 +1669,7 @@ ORDERS
 
                     </div>
 
-
                     <div className="details-customer">
-
 
                       <div className="detail-row">
 
@@ -1807,15 +1678,11 @@ ORDERS
                         </span>
 
                         <strong>
-                          {
-                            selectedOrder.customer
-                              ?.name ||
-                            "—"
-                          }
+                          {selectedOrder.customer
+                            ?.name || "—"}
                         </strong>
 
                       </div>
-
 
                       <div className="detail-row">
 
@@ -1828,17 +1695,11 @@ ORDERS
                         </span>
 
                         <strong className="break-text">
-
-                          {
-                            selectedOrder.customer
-                              ?.email ||
-                            "—"
-                          }
-
+                          {selectedOrder.customer
+                            ?.email || "—"}
                         </strong>
 
                       </div>
-
 
                       <div className="detail-row">
 
@@ -1851,22 +1712,15 @@ ORDERS
                         </span>
 
                         <strong>
-
-                          {
-                            selectedOrder.customer
-                              ?.phone ||
-                            "—"
-                          }
-
+                          {selectedOrder.customer
+                            ?.phone || "—"}
                         </strong>
 
                       </div>
 
-
                     </div>
 
                   </section>
-
 
                   {/* =================================================
                       SHIPPING
@@ -1884,26 +1738,19 @@ ORDERS
 
                     </div>
 
-
                     <div className="shipping-address">
 
                       <p>
-                        {
-                          selectedOrder
-                            .shippingAddress
-                            ?.address ||
-                          "—"
-                        }
+                        {selectedOrder
+                          .shippingAddress
+                          ?.address || "—"}
                       </p>
 
                       <p>
 
-                        {
-                          selectedOrder
-                            .shippingAddress
-                            ?.city ||
-                          ""
-                        }
+                        {selectedOrder
+                          .shippingAddress
+                          ?.city || ""}
 
                         {selectedOrder
                           .shippingAddress
@@ -1914,12 +1761,9 @@ ORDERS
                           ? ", "
                           : ""}
 
-                        {
-                          selectedOrder
-                            .shippingAddress
-                            ?.state ||
-                          ""
-                        }
+                        {selectedOrder
+                          .shippingAddress
+                          ?.state || ""}
 
                       </p>
 
@@ -1927,19 +1771,15 @@ ORDERS
 
                         PINCODE:{" "}
 
-                        {
-                          selectedOrder
-                            .shippingAddress
-                            ?.pincode ||
-                          "—"
-                        }
+                        {selectedOrder
+                          .shippingAddress
+                          ?.pincode || "—"}
 
                       </strong>
 
                     </div>
 
                   </section>
-
 
                   {/* =================================================
                       PRODUCTS
@@ -1957,14 +1797,10 @@ ORDERS
 
                     </div>
 
-
                     <div className="details-products">
 
                       {selectedOrder.items?.map(
-                        (
-                          item,
-                          index
-                        ) => (
+                        (item, index) => (
 
                           <div
                             className="details-product"
@@ -1972,50 +1808,34 @@ ORDERS
                           >
 
                             <img
-                              src={
-                                item.image
-                              }
-                              alt={
-                                item.name
-                              }
+                              src={item.image}
+                              alt={item.name}
                             />
-
 
                             <div className="details-product-info">
 
                               <strong>
-                                {
-                                  item.name
-                                }
+                                {item.name}
                               </strong>
 
                               <span>
                                 ZANHOD /{" "}
-                                {
-                                  item.productId
-                                }
+                                {item.productId}
                               </span>
 
                               <span>
                                 SIZE{" "}
-                                {
-                                  item.size
-                                }{" "}
-                                · QTY{" "}
-                                {
-                                  item.quantity
-                                }
+                                {item.size} · QTY{" "}
+                                {item.quantity}
                               </span>
 
                             </div>
-
 
                             <strong className="details-product-price">
 
                               ₹
                               {Number(
-                                item.price ||
-                                  0
+                                item.price || 0
                               ).toLocaleString(
                                 "en-IN"
                               )}
@@ -2030,7 +1850,6 @@ ORDERS
                     </div>
 
                   </section>
-
 
                   {/* =================================================
                       PAYMENT
@@ -2048,9 +1867,7 @@ ORDERS
 
                     </div>
 
-
                     <div className="payment-details">
-
 
                       <div className="detail-row">
 
@@ -2063,16 +1880,11 @@ ORDERS
                             selectedOrder.paymentStatus
                           )}`}
                         >
-
-                          {
-                            selectedOrder.paymentStatus ||
-                            "UNKNOWN"
-                          }
-
+                          {selectedOrder.paymentStatus ||
+                            "UNKNOWN"}
                         </strong>
 
                       </div>
-
 
                       <div className="detail-row">
 
@@ -2081,16 +1893,11 @@ ORDERS
                         </span>
 
                         <strong>
-
-                          {
-                            selectedOrder.paymentMethod ||
-                            "RAZORPAY"
-                          }
-
+                          {selectedOrder.paymentMethod ||
+                            "RAZORPAY"}
                         </strong>
 
                       </div>
-
 
                       {selectedOrder.razorpayPaymentId && (
 
@@ -2101,17 +1908,14 @@ ORDERS
                           </span>
 
                           <strong className="break-text">
-
                             {
                               selectedOrder.razorpayPaymentId
                             }
-
                           </strong>
 
                         </div>
 
                       )}
-
 
                       {selectedOrder.razorpayOrderId && (
 
@@ -2122,11 +1926,9 @@ ORDERS
                           </span>
 
                           <strong className="break-text">
-
                             {
                               selectedOrder.razorpayOrderId
                             }
-
                           </strong>
 
                         </div>
@@ -2136,7 +1938,6 @@ ORDERS
                     </div>
 
                   </section>
-
 
                   {/* =================================================
                       ORDER SUMMARY
@@ -2154,9 +1955,7 @@ ORDERS
 
                     </div>
 
-
                     <div className="details-summary">
-
 
                       <div>
 
@@ -2177,7 +1976,6 @@ ORDERS
                         </strong>
 
                       </div>
-
 
                       <div>
 
@@ -2202,7 +2000,6 @@ ORDERS
 
                       </div>
 
-
                       <div className="details-total">
 
                         <span>
@@ -2223,11 +2020,9 @@ ORDERS
 
                       </div>
 
-
                     </div>
 
                   </section>
-
 
                   {/* =================================================
                       ORDER INFORMATION
@@ -2245,9 +2040,7 @@ ORDERS
 
                     </div>
 
-
                     <div className="order-information">
-
 
                       <div className="detail-row">
 
@@ -2260,15 +2053,12 @@ ORDERS
                         </span>
 
                         <strong className="break-text">
-
                           {
                             selectedOrder.orderNumber
                           }
-
                         </strong>
 
                       </div>
-
 
                       <div className="detail-row">
 
@@ -2283,15 +2073,12 @@ ORDERS
                         </span>
 
                         <strong>
-
                           {formatDate(
                             selectedOrder.createdAt
                           )}
-
                         </strong>
 
                       </div>
-
 
                       <div className="detail-row">
 
@@ -2300,20 +2087,16 @@ ORDERS
                         </span>
 
                         <strong>
-
                           {formatTime(
                             selectedOrder.createdAt
                           )}
-
                         </strong>
 
                       </div>
 
-
                     </div>
 
                   </section>
-
 
                 </>
 
@@ -2328,10 +2111,7 @@ ORDERS
       )}
 
     </main>
-
   );
-
 }
-
 
 export default AdminOrders;
