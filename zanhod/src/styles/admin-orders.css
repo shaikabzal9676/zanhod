@@ -1,0 +1,672 @@
+/* =========================================
+   ZANHOD ADMIN
+========================================= */
+
+.admin-page {
+  min-height: 100vh;
+
+  padding: 45px 5vw 80px;
+
+  background: #080808;
+
+  color: #f4f1ec;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.admin-header {
+  max-width: 1500px;
+
+  margin: 0 auto 45px;
+
+  padding-bottom: 30px;
+
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: space-between;
+
+  border-bottom: 1px solid #292929;
+}
+
+.admin-eyebrow {
+  margin: 0 0 10px;
+
+  color: #8f1d26;
+
+  font-size: 9px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.18em;
+}
+
+.admin-header h1 {
+  margin: 0;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: clamp(45px, 6vw, 80px);
+
+  line-height: 0.9;
+
+  letter-spacing: -0.05em;
+}
+
+.admin-refresh {
+  height: 44px;
+
+  padding: 0 18px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  border: 1px solid #292929;
+
+  border-radius: 0;
+
+  background: transparent;
+
+  color: #a7a3a0;
+
+  font-size: 9px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.12em;
+
+  cursor: pointer;
+
+  transition:
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.admin-refresh:hover {
+  color: #f4f1ec;
+
+  border-color: #8f1d26;
+}
+
+.admin-refresh:disabled {
+  opacity: 0.5;
+
+  cursor: default;
+}
+
+.refresh-spinning {
+  animation: admin-spin 1s linear infinite;
+}
+
+@keyframes admin-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================================
+   STATS
+========================================= */
+
+.admin-stats {
+  max-width: 1500px;
+
+  margin: 0 auto 35px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  border-top: 1px solid #292929;
+
+  border-left: 1px solid #292929;
+}
+
+.admin-stat {
+  min-height: 120px;
+
+  padding: 22px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 16px;
+
+  border-right: 1px solid #292929;
+
+  border-bottom: 1px solid #292929;
+}
+
+.admin-stat svg {
+  margin-top: 2px;
+
+  flex-shrink: 0;
+
+  color: #8f1d26;
+}
+
+.admin-stat div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.admin-stat span {
+  color: #666;
+
+  font-size: 8px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.14em;
+}
+
+.admin-stat strong {
+  color: #f4f1ec;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: 27px;
+
+  font-weight: 500;
+}
+
+.admin-revenue {
+  justify-content: flex-start;
+}
+
+
+/* =========================================
+   CONTENT
+========================================= */
+
+.admin-content {
+  max-width: 1500px;
+
+  margin: 0 auto;
+}
+
+.orders-table-wrapper {
+  overflow-x: auto;
+
+  border: 1px solid #292929;
+
+  background: #101010;
+}
+
+.orders-table {
+  width: 100%;
+
+  min-width: 1050px;
+
+  border-collapse: collapse;
+}
+
+.orders-table th {
+  padding: 17px 18px;
+
+  background: #121212;
+
+  border-bottom: 1px solid #292929;
+
+  color: #666;
+
+  text-align: left;
+
+  font-size: 8px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.14em;
+}
+
+.orders-table td {
+  padding: 20px 18px;
+
+  border-bottom: 1px solid #202020;
+
+  vertical-align: middle;
+
+  font-size: 11px;
+}
+
+.orders-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.orders-table tbody tr:hover {
+  background: #131313;
+}
+
+.orders-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+
+/* =========================================
+   ORDER
+========================================= */
+
+.order-number {
+  color: #f4f1ec;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: 11px;
+
+  letter-spacing: 0.02em;
+}
+
+
+/* =========================================
+   CUSTOMER
+========================================= */
+
+.customer-cell {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.customer-cell strong {
+  color: #f4f1ec;
+
+  font-size: 11px;
+
+  font-weight: 500;
+}
+
+.customer-cell span {
+  color: #666;
+
+  font-size: 9px;
+}
+
+
+/* =========================================
+   ITEMS
+========================================= */
+
+.items-count {
+  width: 28px;
+  height: 28px;
+
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #292929;
+
+  color: #a7a3a0;
+
+  font-size: 10px;
+}
+
+
+/* =========================================
+   PAYMENT STATUS
+========================================= */
+
+.payment-status {
+  display: inline-flex;
+
+  padding: 7px 9px;
+
+  border: 1px solid #292929;
+
+  font-size: 8px;
+
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.1em;
+}
+
+.payment-status.paid {
+  border-color: #315d42;
+
+  color: #7db58e;
+}
+
+.payment-status.pending {
+  border-color: #5b4b2a;
+
+  color: #b9a36a;
+}
+
+.payment-status.failed {
+  border-color: #6b1118;
+
+  color: #d08b90;
+}
+
+
+/* =========================================
+   ORDER STATUS
+========================================= */
+
+.status-select {
+  min-width: 125px;
+
+  padding: 9px 10px;
+
+  border: 1px solid #292929;
+
+  border-radius: 0;
+
+  outline: none;
+
+  background: #121212;
+
+  color: #a7a3a0;
+
+  font-family: "Inter", sans-serif;
+
+  font-size: 9px;
+
+  cursor: pointer;
+}
+
+.status-select:focus {
+  border-color: #8f1d26;
+}
+
+.status-select.delivered {
+  color: #7db58e;
+}
+
+.status-select.cancelled {
+  color: #d08b90;
+}
+
+.status-select.shipped {
+  color: #b99a72;
+}
+
+
+/* =========================================
+   DATE
+========================================= */
+
+.order-date {
+  color: #666;
+
+  font-size: 9px;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   STATES
+========================================= */
+
+.admin-state {
+  min-height: 300px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: 1px solid #292929;
+
+  background: #101010;
+
+  color: #666;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.14em;
+}
+
+.admin-error {
+  color: #d08b90;
+
+  border-color: #6b1118;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 900px) {
+  .admin-page {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+
+  .admin-stats {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-header {
+    align-items: flex-start;
+
+    gap: 25px;
+  }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+  .admin-page {
+    padding: 30px 15px 60px;
+  }
+
+  .admin-header {
+    display: block;
+
+    margin-bottom: 30px;
+  }
+
+  .admin-header h1 {
+    font-size: 52px;
+  }
+
+  .admin-refresh {
+    margin-top: 25px;
+  }
+
+  .admin-stats {
+    grid-template-columns: 1fr;
+
+    margin-bottom: 25px;
+  }
+
+  .admin-stat {
+    min-height: 90px;
+  }
+
+  .admin-stat strong {
+    font-size: 24px;
+  }
+}
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.admin-pagination {
+  margin-top: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+}
+
+
+.pagination-button {
+  min-height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 15px;
+
+  border: 1px solid #292929;
+
+  background: #121212;
+
+  color: #aaa;
+
+  font-size: 8px;
+  font-weight: 700;
+
+  letter-spacing: 0.1em;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+
+.pagination-button:hover:not(:disabled) {
+  background: #1a1a1a;
+
+  border-color: #8f1d26;
+
+  color: #f4f1ec;
+}
+
+
+.pagination-button:disabled {
+  opacity: 0.35;
+
+  cursor: not-allowed;
+}
+
+
+.pagination-pages {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+}
+
+
+.pagination-page {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #292929;
+
+  background: #121212;
+
+  color: #777;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+.pagination-page:hover {
+  border-color: #6b1118;
+
+  color: #f4f1ec;
+}
+
+
+.pagination-page.active {
+  background: #6b1118;
+
+  border-color: #8f1d26;
+
+  color: #f4f1ec;
+}
+
+
+/* =========================================================
+   PAGINATION RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+
+  .admin-pagination {
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    gap: 10px;
+  }
+
+
+  .pagination-button {
+    flex: 1;
+
+    min-width: 110px;
+  }
+
+
+  .pagination-pages {
+    order: -1;
+
+    width: 100%;
+
+    justify-content: center;
+
+    overflow-x: auto;
+
+    padding-bottom: 2px;
+  }
+
+
+  .pagination-page {
+    flex-shrink: 0;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .pagination-page {
+    width: 32px;
+    height: 32px;
+  }
+
+}

@@ -1,0 +1,812 @@
+/* =========================================================
+   ZANHOD TRACK ORDER
+   Premium Dark Editorial
+========================================================= */
+
+.track-order-page {
+  min-height: 100vh;
+
+  padding: 150px 6vw 100px;
+
+  background: #080808;
+  color: #f4f1ec;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.track-order-header {
+  max-width: 760px;
+
+  margin: 0 auto;
+
+  text-align: center;
+}
+
+
+.track-order-header p {
+  margin: 0 0 18px;
+
+  color: #8f1d26;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 0.2em;
+}
+
+
+.track-order-header h1 {
+  margin: 0;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: clamp(42px, 7vw, 82px);
+
+  line-height: 0.88;
+
+  letter-spacing: -0.06em;
+}
+
+
+.track-order-header span {
+  display: block;
+
+  max-width: 480px;
+
+  margin: 25px auto 0;
+
+  color: #777;
+
+  font-size: 12px;
+
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.track-order-form {
+  max-width: 700px;
+
+  margin: 60px auto 0;
+
+  padding: 28px;
+
+  background: #101010;
+
+  border: 1px solid #292929;
+}
+
+
+.track-field {
+  margin-bottom: 18px;
+}
+
+
+.track-field label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #666;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.14em;
+}
+
+
+.track-field input {
+  width: 100%;
+
+  height: 50px;
+
+  padding: 0 14px;
+
+  border: 1px solid #292929;
+
+  outline: none;
+
+  background: #0b0b0b;
+
+  color: #f4f1ec;
+
+  font-family: "Inter", sans-serif;
+
+  font-size: 12px;
+
+  transition:
+    border-color 0.2s ease;
+}
+
+
+.track-field input::placeholder {
+  color: #444;
+}
+
+
+.track-field input:focus {
+  border-color: #6b1118;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.track-error {
+  margin: 12px 0;
+
+  padding: 12px 14px;
+
+  border: 1px solid rgba(143, 29, 38, 0.5);
+
+  background: rgba(107, 17, 24, 0.12);
+
+  color: #c9858b;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.track-button {
+  width: 100%;
+
+  height: 52px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  margin-top: 8px;
+
+  border: 1px solid #8f1d26;
+
+  background: #6b1118;
+
+  color: #f4f1ec;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.14em;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+.track-button:hover:not(:disabled) {
+  background: #8f1d26;
+
+  border-color: #a52a34;
+}
+
+
+.track-button:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   TRACKED ORDER
+========================================================= */
+
+.tracked-order {
+  max-width: 900px;
+
+  margin: 55px auto 0;
+
+  border: 1px solid #292929;
+
+  background: #0d0d0d;
+}
+
+
+/* =========================================================
+   ORDER HEADER
+========================================================= */
+
+.tracked-order-top {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 25px;
+
+  padding: 25px;
+
+  background: #111111;
+
+  border-bottom: 1px solid #292929;
+}
+
+
+.tracked-order-top > div:first-child {
+  min-width: 0;
+}
+
+
+.tracked-order-top span {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #555;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.14em;
+}
+
+
+.tracked-order-top h2 {
+  margin: 0;
+
+  color: #f4f1ec;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: 17px;
+
+  font-weight: 600;
+
+  word-break: break-all;
+}
+
+
+/* =========================================================
+   CURRENT STATUS
+========================================================= */
+
+.tracked-status {
+  flex-shrink: 0;
+
+  min-height: 34px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 0 12px;
+
+  border: 1px solid #292929;
+
+  background: #171717;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+
+.tracked-status.placed {
+  color: #c9a86c;
+}
+
+
+.tracked-status.confirmed {
+  color: #a8b7d8;
+}
+
+
+.tracked-status.processing {
+  color: #b8a5d1;
+}
+
+
+.tracked-status.shipped {
+  color: #88b5c4;
+}
+
+
+.tracked-status.delivered {
+  color: #8fc59a;
+}
+
+
+.tracked-status.cancelled {
+  color: #d47b83;
+}
+
+
+/* =========================================================
+   TRACKING SECTION
+========================================================= */
+
+.tracking-section {
+  padding: 25px;
+
+  border-bottom: 1px solid #202020;
+}
+
+
+.tracking-section:last-child {
+  border-bottom: 0;
+}
+
+
+.tracking-section-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 22px;
+
+  color: #8f1d26;
+}
+
+
+.tracking-section-title h3 {
+  margin: 0;
+
+  color: #aaa;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.14em;
+}
+
+
+/* =========================================================
+   TRACKING TIMELINE
+========================================================= */
+
+.tracking-timeline {
+  display: flex;
+
+  flex-direction: column;
+}
+
+
+.tracking-event {
+  position: relative;
+
+  display: flex;
+
+  gap: 15px;
+
+  min-height: 82px;
+}
+
+
+.tracking-marker {
+  position: relative;
+
+  width: 32px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  justify-content: center;
+}
+
+
+.tracking-marker::after {
+  content: "";
+
+  position: absolute;
+
+  top: 31px;
+  bottom: -1px;
+
+  left: 15px;
+
+  width: 1px;
+
+  background: #292929;
+}
+
+
+.tracking-event:last-child
+.tracking-marker::after {
+  display: none;
+}
+
+
+.tracking-marker span {
+  position: relative;
+
+  z-index: 2;
+
+  width: 31px;
+  height: 31px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: 1px solid #292929;
+
+  background: #111;
+
+  color: #555;
+}
+
+
+.tracking-event.current
+.tracking-marker span {
+  background: #6b1118;
+
+  border-color: #8f1d26;
+
+  color: #f4f1ec;
+
+  box-shadow:
+    0 0 18px rgba(143, 29, 38, 0.2);
+}
+
+
+/* =========================================================
+   EVENT CONTENT
+========================================================= */
+
+.tracking-event-content {
+  flex: 1;
+
+  padding-bottom: 25px;
+}
+
+
+.tracking-event-content > div {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+}
+
+
+.tracking-event-content strong {
+  color: #aaa;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+
+.tracking-event.current
+.tracking-event-content strong {
+  color: #f4f1ec;
+}
+
+
+.tracking-event-content small {
+  padding: 4px 6px;
+
+  border: 1px solid rgba(143, 29, 38, 0.45);
+
+  background: rgba(107, 17, 24, 0.12);
+
+  color: #b96a71;
+
+  font-size: 6px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.1em;
+}
+
+
+.tracking-event-content p {
+  margin: 7px 0 5px;
+
+  color: #666;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+}
+
+
+.tracking-event-content time {
+  color: #444;
+
+  font-size: 8px;
+}
+
+
+/* =========================================================
+   PRODUCTS
+========================================================= */
+
+.tracked-products {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+
+.tracked-product {
+  min-height: 78px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 10px;
+
+  background: #0c0c0c;
+
+  border: 1px solid #202020;
+}
+
+
+.tracked-product img {
+  width: 55px;
+  height: 66px;
+
+  flex-shrink: 0;
+
+  object-fit: cover;
+
+  background: #151515;
+
+  border: 1px solid #292929;
+}
+
+
+.tracked-product > div {
+  flex: 1;
+
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+
+.tracked-product strong {
+  color: #ddd;
+
+  font-size: 10px;
+
+  font-weight: 600;
+}
+
+
+.tracked-product span {
+  color: #555;
+
+  font-size: 8px;
+
+  letter-spacing: 0.05em;
+}
+
+
+.tracked-product b {
+  flex-shrink: 0;
+
+  color: #f4f1ec;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.tracking-summary {
+  padding: 25px;
+}
+
+
+.tracking-summary > div {
+  min-height: 38px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border-bottom: 1px solid #202020;
+}
+
+
+.tracking-summary span {
+  color: #555;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.1em;
+}
+
+
+.tracking-summary strong {
+  color: #aaa;
+
+  font-size: 10px;
+}
+
+
+.tracking-summary .tracking-total {
+  margin-top: 8px;
+
+  padding-top: 8px;
+
+  border-top: 1px solid #292929;
+
+  border-bottom: 0;
+}
+
+
+.tracking-total span {
+  color: #aaa;
+}
+
+
+.tracking-total strong {
+  color: #f4f1ec;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: 18px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+
+  .track-order-page {
+    padding: 125px 18px 70px;
+  }
+
+
+  .track-order-header h1 {
+    font-size: 52px;
+  }
+
+
+  .track-order-form {
+    margin-top: 40px;
+
+    padding: 20px;
+  }
+
+
+  .tracked-order {
+    margin-top: 35px;
+  }
+
+
+  .tracked-order-top {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    padding: 20px;
+  }
+
+
+  .tracked-status {
+    align-self: flex-start;
+  }
+
+
+  .tracking-section,
+  .tracking-summary {
+    padding: 20px;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .track-order-page {
+    padding: 110px 14px 55px;
+  }
+
+
+  .track-order-header h1 {
+    font-size: 43px;
+  }
+
+
+  .track-order-header span {
+    font-size: 11px;
+  }
+
+
+  .track-order-form {
+    padding: 16px;
+  }
+
+
+  .tracked-order-top h2 {
+    font-size: 14px;
+  }
+
+
+  .tracked-product b {
+    font-size: 10px;
+  }
+
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.track-order-page input:focus-visible,
+.track-order-page button:focus-visible {
+  outline: 1px solid #8f1d26;
+
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .track-button,
+  .track-field input {
+    transition: none;
+  }
+
+}

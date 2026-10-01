@@ -1,0 +1,479 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+
+/* =========================================
+   ZANHOD DESIGN SYSTEM
+   DO NOT CHANGE WITHOUT APPROVAL
+========================================= */
+
+:root {
+
+  /* Colors */
+  --black: #080808;
+  --charcoal: #121212;
+
+  --burgundy: #6B1118;
+  --burgundy-light: #8F1D26;
+
+  --white: #F4F1EC;
+  --gray: #A7A3A0;
+
+  --border: #292929;
+
+
+  /* Typography */
+  --font-heading: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+
+  /* Layout */
+  --container: 1440px;
+  --padding-desktop: 60px;
+  --padding-mobile: 22px;
+
+
+  /* Animation */
+  --transition: 0.3s ease;
+}
+
+
+/* =========================================
+   RESET
+========================================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+
+button {
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+img {
+  display: block;
+  width: 100%;
+}
+
+
+/* =========================================
+   NAVBAR
+========================================= */
+
+.navbar {
+  position: relative;
+  z-index: 1000;
+
+  width: 100%;
+
+  background: rgba(8, 8, 8, 0.94);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(14px);
+}
+
+
+.navbar-inner {
+  height: 76px;
+
+  max-width: var(--container);
+
+  margin: auto;
+
+  padding: 0 var(--padding-desktop);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+}
+
+
+/* =========================================
+   LOGO
+========================================= */
+
+.brand-logo {
+  width: 102px;
+  height: 102px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-family: var(--font-heading);
+
+  font-size: 30px;
+
+  font-weight: 700;
+
+  letter-spacing: -3px;
+
+  color: var(--white);
+}
+
+
+/* =========================================
+   DESKTOP NAV
+========================================= */
+
+.desktop-nav {
+  display: flex;
+
+  align-items: center;
+
+  gap: 42px;
+
+  margin-left: 100px;
+}
+
+
+.desktop-nav a {
+  position: relative;
+
+  font-size: 11px;
+
+  font-weight: 500;
+
+  letter-spacing: 2px;
+
+  color: var(--gray);
+
+  transition: var(--transition);
+}
+
+
+.desktop-nav a::after {
+
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  bottom: -7px;
+
+  width: 0;
+  height: 1px;
+
+  background: var(--burgundy-light);
+
+  transition: var(--transition);
+}
+
+
+.desktop-nav a:hover {
+  color: var(--white);
+}
+
+
+.desktop-nav a:hover::after {
+  width: 100%;
+}
+
+
+/* =========================================
+   NAVBAR ACTIONS
+========================================= */
+
+.navbar-actions {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 22px;
+}
+
+
+.navbar-actions button {
+
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: var(--gray);
+
+  transition: var(--transition);
+}
+
+
+.navbar-actions button:hover {
+  color: var(--white);
+}
+
+
+.cart-count {
+
+  position: absolute;
+
+  top: 20px;
+  right: 50px;
+
+  width: 15px;
+  height: 15px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background: var(--burgundy);
+
+  border-radius: 50%;
+
+  font-size: 8px;
+
+  color: var(--white);
+}
+
+
+/* =========================================
+   MOBILE MENU BUTTON
+========================================= */
+
+.mobile-menu-button {
+  display: none;
+}
+
+
+/* =========================================
+   MOBILE NAV
+========================================= */
+
+.mobile-nav {
+  display: none;
+}
+
+
+/* =========================================
+   TEMPORARY HERO
+========================================= */
+
+.hero-placeholder {
+
+  min-height: calc(100vh - 76px);
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: flex-start;
+
+  padding: 80px var(--padding-desktop);
+
+  background:
+    radial-gradient(
+      circle at 80% 50%,
+      rgba(107, 17, 24, 0.25),
+      transparent 35%
+    ),
+    var(--black);
+}
+
+
+.hero-placeholder p {
+
+  margin-bottom: 15px;
+
+  font-family: var(--font-heading);
+
+  font-size: 13px;
+
+  letter-spacing: 8px;
+
+  color: var(--gray);
+}
+
+
+.hero-placeholder h1 {
+
+  font-family: var(--font-heading);
+
+  font-size: clamp(70px, 10vw, 160px);
+
+  line-height: 0.9;
+
+  letter-spacing: -6px;
+}
+
+
+.hero-placeholder span {
+
+  margin-top: 25px;
+
+  font-size: 12px;
+
+  letter-spacing: 4px;
+
+  color: var(--gray);
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .navbar-inner {
+    height: 68px;
+
+    padding: 0 var(--padding-mobile);
+  }
+
+
+  .mobile-menu-button {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: var(--white);
+  }
+
+  .cart-count{
+    right:10px;
+  }
+
+
+  .brand-logo {
+    position: absolute;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 80px;
+    height: 80px;
+    background: none;
+  }
+
+
+
+  .desktop-nav {
+    display: none;
+  }
+
+
+  .navbar-actions {
+    margin-left: auto;
+
+    gap: 16px;
+  }
+
+
+  .mobile-nav {
+
+    display: flex;
+
+    position: absolute;
+
+    top: 68px;
+
+    left: 0;
+
+    width: 100%;
+
+    padding: 25px var(--padding-mobile);
+
+    flex-direction: column;
+
+    gap: 25px;
+
+    background: var(--charcoal);
+
+    border-bottom: 1px solid var(--border);
+
+    transform: translateY(-120%);
+
+    transition: transform 0.35s ease;
+
+    z-index: -1;
+  }
+
+
+  .mobile-nav.open {
+    transform: translateY(0);
+  }
+
+
+  .mobile-nav a {
+
+    font-family: var(--font-heading);
+
+    font-size: 18px;
+
+    letter-spacing: 2px;
+
+    color: var(--white);
+  }
+
+
+  .hero-placeholder {
+
+    min-height: calc(100vh - 68px);
+
+    padding: 50px var(--padding-mobile);
+  }
+
+
+  .hero-placeholder h1 {
+
+    font-size: 70px;
+
+    letter-spacing: -4px;
+  }
+
+
+  .hero-placeholder span {
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+
+    line-height: 1.8;
+  }
+
+}

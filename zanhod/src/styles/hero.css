@@ -1,0 +1,664 @@
+/* =========================================
+   ZANHOD HERO
+========================================= */
+
+.hero {
+  position: relative;
+
+  min-height: calc(100vh - 76px);
+
+  width: 100%;
+
+  overflow: hidden;
+
+  background: var(--black);
+}
+
+
+/* =========================================
+   IMAGE
+========================================= */
+
+.hero-image {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+}
+
+
+.hero-image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  object-position: center;
+
+  animation: heroImageReveal 1.4s ease forwards;
+}
+
+
+@keyframes heroImageReveal {
+
+  from {
+    transform: scale(1.08);
+
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+
+    opacity: 1;
+  }
+
+}
+
+
+/* =========================================
+   DARK OVERLAY
+========================================= */
+
+.hero-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 2;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(8, 8, 8, 0.98) 0%,
+      rgba(8, 8, 8, 0.82) 28%,
+      rgba(8, 8, 8, 0.35) 60%,
+      rgba(8, 8, 8, 0.55) 100%
+    );
+
+}
+
+
+/* Bottom darkness */
+
+.hero-overlay::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      0deg,
+      rgba(8, 8, 8, 0.75),
+      transparent 30%
+    );
+}
+
+
+/* =========================================
+   BURGUNDY ATMOSPHERE
+========================================= */
+
+.hero-burgundy-glow {
+
+  position: absolute;
+
+  z-index: 3;
+
+  width: 600px;
+  height: 600px;
+
+  right: -150px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  background: rgba(107, 17, 24, 0.18);
+
+  filter: blur(120px);
+
+  pointer-events: none;
+}
+
+
+/* =========================================
+   CONTENT
+========================================= */
+
+.hero-content {
+
+  position: relative;
+
+  z-index: 5;
+
+  min-height: calc(100vh - 76px);
+
+  max-width: var(--container);
+
+  margin: auto;
+
+  padding: 0 var(--padding-desktop);
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: flex-start;
+
+  padding-bottom: 40px;
+}
+
+
+/* =========================================
+   BRAND
+========================================= */
+
+.hero-brand {
+
+  margin-bottom: 18px;
+
+  font-family: var(--font-heading);
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  letter-spacing: 8px;
+
+  color: var(--gray);
+
+  animation: heroContent 0.8s ease 0.2s both;
+}
+
+
+/* =========================================
+   TITLE
+========================================= */
+
+.hero-content h1 {
+
+  font-family: var(--font-heading);
+
+  font-size: clamp(
+    80px,
+    10vw,
+    155px
+  );
+
+  font-weight: 600;
+
+  line-height: 0.82;
+
+  letter-spacing: -7px;
+
+  color: var(--white);
+
+  animation: heroContent 0.8s ease 0.35s both;
+}
+
+
+.hero-content h1 span {
+
+  color: var(--burgundy-light);
+
+}
+
+
+/* =========================================
+   SUBTITLE
+========================================= */
+
+.hero-subtitle {
+
+  margin-top: 30px;
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  letter-spacing: 5px;
+
+  color: var(--white);
+
+  animation: heroContent 0.8s ease 0.5s both;
+}
+
+
+/* =========================================
+   LINE
+========================================= */
+
+.hero-line {
+
+  width: 30px;
+
+  height: 1px;
+
+  margin: 20px 0;
+
+  background: var(--burgundy-light);
+
+  animation: heroContent 0.8s ease 0.6s both;
+}
+
+
+/* =========================================
+   DESCRIPTION
+========================================= */
+
+.hero-description {
+
+  max-width: 390px;
+
+  font-size: 14px;
+
+  line-height: 1.8;
+
+  color: var(--gray);
+
+  animation: heroContent 0.8s ease 0.65s both;
+}
+
+
+/* =========================================
+   BUTTON
+========================================= */
+
+.hero-button {
+
+  margin-top: 32px;
+
+  min-width: 155px;
+
+  height: 48px;
+
+  padding: 0 22px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 25px;
+
+  background: var(--burgundy);
+
+  color: var(--white);
+
+  font-family: var(--font-heading);
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  letter-spacing: 2px;
+
+  transition:
+    background 0.3s ease,
+    transform 0.3s ease;
+
+  animation: heroContent 0.8s ease 0.75s both;
+}
+
+
+.hero-button span {
+
+  font-size: 16px;
+
+  transition: transform 0.3s ease;
+}
+
+
+.hero-button:hover {
+
+  background: var(--burgundy-light);
+
+  transform: translateY(-2px);
+}
+
+
+.hero-button:hover span {
+
+  transform: translateX(5px);
+}
+
+
+/* =========================================
+   CONTENT ANIMATION
+========================================= */
+
+@keyframes heroContent {
+
+  from {
+
+    opacity: 0;
+
+    transform: translateY(25px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform: translateY(0);
+
+  }
+
+}
+
+
+/* =========================================
+   SLIDE INDICATORS
+========================================= */
+
+.hero-slides {
+
+  position: absolute;
+
+  z-index: 6;
+
+  bottom: 38px;
+
+  left: var(--padding-desktop);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 25px;
+}
+
+
+.hero-slides span {
+
+  position: relative;
+
+  font-family: var(--font-heading);
+
+  font-size: 10px;
+
+  letter-spacing: 1px;
+
+  color: #666;
+
+}
+
+
+.hero-slides span.active {
+
+  color: var(--white);
+
+}
+
+
+.hero-slides span.active::after {
+
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+
+  bottom: -10px;
+
+  width: 32px;
+
+  height: 1px;
+
+  background: var(--white);
+}
+
+
+/* =========================================
+   SCROLL INDICATOR
+========================================= */
+
+.hero-scroll {
+
+  position: absolute;
+
+  z-index: 6;
+
+  right: var(--padding-desktop);
+
+  bottom: 35px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+
+.hero-scroll span {
+
+  font-family: var(--font-heading);
+
+  font-size: 8px;
+
+  letter-spacing: 3px;
+
+  color: var(--gray);
+
+  writing-mode: vertical-rl;
+}
+
+
+.scroll-line {
+
+  width: 1px;
+
+  height: 45px;
+
+  background: linear-gradient(
+    to bottom,
+    var(--burgundy-light),
+    transparent
+  );
+
+  animation: scrollPulse 1.8s ease-in-out infinite;
+}
+
+
+@keyframes scrollPulse {
+
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+}
+
+
+/* =========================================
+   TEMPORARY NEXT SECTION
+========================================= */
+
+.next-section {
+
+  min-height: 400px;
+
+  padding: 100px var(--padding-desktop);
+
+  background: var(--black);
+}
+
+
+.next-section p {
+
+  font-family: var(--font-heading);
+
+  letter-spacing: 5px;
+
+  color: var(--burgundy-light);
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1000px) {
+
+  .hero-content {
+
+    padding-right: 40%;
+  }
+
+
+  .hero-content h1 {
+
+    font-size: clamp(
+      70px,
+      11vw,
+      120px
+    );
+
+  }
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .hero {
+
+    min-height: calc(100svh - 68px);
+  }
+
+
+  .hero-image img {
+
+    object-position: 65% center;
+  }
+
+
+  .hero-overlay {
+
+    background:
+      linear-gradient(
+        90deg,
+        rgba(8, 8, 8, 0.96),
+        rgba(8, 8, 8, 0.65)
+      ),
+      linear-gradient(
+        0deg,
+        rgba(8, 8, 8, 0.8),
+        transparent 60%
+      );
+  }
+
+
+  .hero-content {
+
+    min-height: calc(100svh - 68px);
+
+    padding:
+      40px
+      var(--padding-mobile)
+      90px;
+
+    justify-content: center;
+  }
+
+
+  .hero-brand {
+
+    font-size: 9px;
+
+    letter-spacing: 6px;
+
+    margin-bottom: 16px;
+  }
+
+
+  .hero-content h1 {
+
+    font-size: clamp(
+      70px,
+      22vw,
+      110px
+    );
+
+    letter-spacing: -5px;
+  }
+
+
+  .hero-subtitle {
+
+    max-width: 300px;
+
+    margin-top: 25px;
+
+    font-size: 9px;
+
+    line-height: 1.8;
+
+    letter-spacing: 3px;
+  }
+
+
+  .hero-description {
+
+    max-width: 290px;
+
+    font-size: 12px;
+
+    line-height: 1.7;
+  }
+
+
+  .hero-button {
+
+    height: 46px;
+
+    margin-top: 28px;
+  }
+
+
+  .hero-slides {
+
+    left: var(--padding-mobile);
+
+    bottom: 25px;
+
+    gap: 20px;
+  }
+
+
+  .hero-scroll {
+
+    right: var(--padding-mobile);
+
+    bottom: 25px;
+  }
+
+
+  .hero-burgundy-glow {
+
+    width: 350px;
+
+    height: 350px;
+
+    right: -200px;
+  }
+
+}

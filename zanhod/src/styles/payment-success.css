@@ -1,0 +1,180 @@
+.payment-success-page {
+  min-height: calc(100vh - 80px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 80px 24px;
+}
+
+
+.success-mark {
+  width: 72px;
+  height: 72px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #8F1D26;
+
+  color: #F4F1EC;
+
+  margin-bottom: 32px;
+}
+
+
+.success-eyebrow {
+  margin: 0 0 16px;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 0.18em;
+
+  color: #8F1D26;
+}
+
+
+.payment-success-page h1 {
+  margin: 0;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: clamp(52px, 8vw, 110px);
+
+  line-height: 0.9;
+
+  letter-spacing: -0.05em;
+
+  color: #F4F1EC;
+}
+
+
+.success-message {
+  max-width: 480px;
+
+  margin: 28px auto 0;
+
+  color: #A7A3A0;
+
+  font-size: 15px;
+
+  line-height: 1.7;
+}
+
+
+.success-order {
+  margin-top: 36px;
+
+  padding: 20px 32px;
+
+  border: 1px solid #292929;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+
+.success-order span {
+  font-size: 9px;
+
+  letter-spacing: 0.16em;
+
+  color: #A7A3A0;
+}
+
+
+.success-order strong {
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: 15px;
+
+  letter-spacing: 0.05em;
+
+  color: #F4F1EC;
+}
+
+
+.success-note {
+  max-width: 440px;
+
+  margin: 24px auto 0;
+
+  font-size: 12px;
+
+  line-height: 1.7;
+
+  color: #777;
+}
+
+
+.success-button {
+  margin-top: 40px;
+
+  min-width: 220px;
+
+  padding: 16px 22px;
+
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 20px;
+
+  background: #8F1D26;
+
+  color: #F4F1EC;
+
+  text-decoration: none;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.12em;
+
+  transition: background 0.25s ease;
+}
+
+
+.success-button:hover {
+  background: #6B1118;
+}
+
+
+.success-button span {
+  font-size: 18px;
+}
+
+
+@media (max-width: 600px) {
+
+  .payment-success-page {
+    padding: 60px 20px;
+  }
+
+  .success-mark {
+    width: 64px;
+    height: 64px;
+
+    margin-bottom: 26px;
+  }
+
+  .success-order {
+    width: 100%;
+
+    box-sizing: border-box;
+  }
+
+  .success-button {
+    width: 100%;
+  }
+}
