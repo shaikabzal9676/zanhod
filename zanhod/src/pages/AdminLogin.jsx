@@ -4,6 +4,8 @@ import { Lock, Mail, ArrowRight } from "lucide-react";
 
 import { useAdminAuth } from "../context/AdminAuthContext";
 import "../styles/admin-login.css";
+import logo from "../images/logo.png"
+
 
 function AdminLogin() {
   const navigate = useNavigate();
@@ -48,7 +50,7 @@ function AdminLogin() {
 
         <div className="admin-login-brand">
           <div className="admin-login-logo">
-            Z
+            <img src={logo} alt=""/>
           </div>
 
           <p>ZANHOD / ADMIN</p>
