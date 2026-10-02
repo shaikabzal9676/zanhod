@@ -21,6 +21,8 @@ import {
 
 import API_URL from "../config/api";
 import { useAdminAuth } from "../context/AdminAuthContext";
+import logo from "../images/logo.png"
+
 
 import "../styles/admin-orders.css";
 
@@ -492,7 +494,7 @@ function AdminOrders() {
         <div className="admin-header-left">
 
           <div className="admin-brand-mark">
-            Z
+            <img src={logo} alt=""/>
           </div>
 
           <div>
