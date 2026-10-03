@@ -9,7 +9,7 @@ import Shop from "./pages/Shop"
 import Drop01 from "./pages/Drop01"
 import About from "./pages/About"
 
-import Contact from "./pages/Contact
+import Contact from "./pages/Contact"
 
 
 import AdminLogin from "./pages/AdminLogin";
