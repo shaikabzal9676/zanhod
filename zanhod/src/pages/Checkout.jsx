@@ -131,7 +131,7 @@ function Checkout() {
       );
 
       setError(
-        "Payment was received, but verification failed. Please contact ZANHOD support."
+        "Payment verification could not be completed. Please contact ZANHOD support if your amount was deducted."
       );
 
       setLoading(false);
