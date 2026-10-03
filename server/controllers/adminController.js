@@ -50,14 +50,11 @@ const loginAdmin = async (req, res) => {
     );
 
     res.cookie("zanhod_admin_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite:
-        process.env.NODE_ENV === "production"
-          ? "none"
-          : "lax",
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
+  maxAge: 24 * 60 * 60 * 1000,
+});
 
     return res.status(200).json({
       success: true,
@@ -80,13 +77,10 @@ const loginAdmin = async (req, res) => {
 
 const logoutAdmin = async (req, res) => {
   res.clearCookie("zanhod_admin_token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite:
-      process.env.NODE_ENV === "production"
-        ? "none"
-        : "lax",
-  });
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
+});
 
   return res.status(200).json({
     success: true,
