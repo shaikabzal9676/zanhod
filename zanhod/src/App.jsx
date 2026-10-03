@@ -13,6 +13,7 @@ import Contact from "./pages/Contact"
 import ShippingPolicy from "./pages/ShippingPolicy"
 import ReturnsRefundPolicy from "./pages/ReturnsRefundPolicy"
 import PrivacyPolicy from "./pages/PrivacyPolicy"
+import Terms from "./pages/Terms"
 
 
 import AdminLogin from "./pages/AdminLogin";
@@ -42,6 +43,8 @@ function App() {
       <Route path="/shipping-policy" element={<ShippingPolicy />} />
       <Route path="/returns-refund-policy" element={<ReturnsRefundPolicy />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-and-conditions" element={<Terms />} />
+
 
 
 
