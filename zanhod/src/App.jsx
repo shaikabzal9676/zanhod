@@ -9,7 +9,6 @@ import Shop from "./pages/Shop";
 import Drop01 from "./pages/Drop01";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
-import SizeGuide from "./pages/SizeGuide";
 
 import AdminLogin from "./pages/AdminLogin";
 import AdminOrders from "./pages/AdminOrders";
@@ -40,7 +39,6 @@ function AppContent() {
         <Route path="/about" element={<About />} />
 
         <Route path="/contact" element={<Contact />} />
-        <Route path="/size-guide" element={<SizeGuide />} />
         <Route path="/shipping-policy" element={<ShippingPolicy />} />
         <Route
           path="/returns-refund-policy"
