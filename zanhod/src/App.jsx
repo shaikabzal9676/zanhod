@@ -9,6 +9,8 @@ import Shop from "./pages/Shop"
 import Drop01 from "./pages/Drop01"
 import About from "./pages/About"
 
+import Contact from "./pages/Contact
+
 
 import AdminLogin from "./pages/AdminLogin";
 import AdminOrders from "./pages/AdminOrders";
@@ -31,6 +33,9 @@ function App() {
       <Route path="/drop-01" element={<Drop01/>}/>
       
       <Route path="/about" element={<About/>}/>
+
+      <Route path="/contact" element={<Contact />} />
+
 
 
       <Route
