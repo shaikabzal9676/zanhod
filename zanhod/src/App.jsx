@@ -11,6 +11,7 @@ import About from "./pages/About"
 
 import Contact from "./pages/Contact"
 import ShippingPolicy from "./pages/ShippingPolicy"
+import ReturnsRefundPolicy from "./pages/ReturnsRefundPolicy"
 
 
 import AdminLogin from "./pages/AdminLogin";
@@ -38,6 +39,7 @@ function App() {
 
       <Route path="/contact" element={<Contact />} />
       <Route path="/shipping-policy" element={<ShippingPolicy />} />
+      <Route path="/returns-refund-policy" element={<ReturnsRefundPolicy />} />
 
 
 
