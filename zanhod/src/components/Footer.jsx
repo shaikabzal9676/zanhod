@@ -10,7 +10,6 @@ function Footer() {
     const email = event.target.email.value.trim();
 
     if (!email) return;
-
     // Newsletter backend can be connected later.
     console.log("Newsletter signup:", email);
 
