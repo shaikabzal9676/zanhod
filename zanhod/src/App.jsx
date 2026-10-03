@@ -5,6 +5,8 @@ import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import Shop from "./pages/Shop"
+
 
 import AdminLogin from "./pages/AdminLogin";
 import AdminOrders from "./pages/AdminOrders";
@@ -21,6 +23,8 @@ function App() {
         path="/"
         element={<Home />}
       />
+
+      <Route path='/shop' element={<Shop/>}/>
 
       <Route
         path="/product/:id"
