@@ -7,6 +7,7 @@ import Checkout from "./pages/Checkout";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import Shop from "./pages/Shop"
 import Drop01 from "./pages/Drop01"
+import About from "./pages/About"
 
 
 import AdminLogin from "./pages/AdminLogin";
@@ -28,6 +29,8 @@ function App() {
       <Route path='/shop' element={<Shop/>}/>
 
       <Route path="/drop-01" element={<Drop01/>}/>
+      
+      <Route path="/about" element={<About/>}/>
 
 
       <Route
