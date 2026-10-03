@@ -1,0 +1,720 @@
+/* =========================================
+   ZANHOD ABOUT
+   Locked ZANHOD theme
+========================================= */
+
+.about-page {
+  background: #080808;
+  color: #f4f1ec;
+}
+
+
+/* =========================================
+   HERO
+========================================= */
+
+.about-hero {
+  position: relative;
+
+  min-height: calc(100vh - 70px);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 90px 7vw;
+
+  overflow: hidden;
+
+  border-bottom: 1px solid #292929;
+}
+
+.about-hero::before {
+  content: "";
+
+  position: absolute;
+
+  width: 600px;
+  height: 600px;
+
+  right: -250px;
+  top: -150px;
+
+  background: #6b1118;
+
+  opacity: 0.13;
+
+  border-radius: 50%;
+
+  filter: blur(130px);
+
+  pointer-events: none;
+}
+
+.about-hero-content {
+  position: relative;
+
+  z-index: 2;
+
+  max-width: 850px;
+}
+
+.about-eyebrow {
+  margin: 0 0 30px;
+
+  color: #a7a3a0;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.22em;
+}
+
+.about-hero h1 {
+  margin: 0;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: clamp(75px, 11vw, 165px);
+
+  line-height: 0.82;
+
+  letter-spacing: -0.075em;
+
+  font-weight: 600;
+}
+
+.about-hero-text {
+  max-width: 430px;
+
+  margin: 45px 0 0;
+
+  color: #a7a3a0;
+
+  font-size: 14px;
+
+  line-height: 1.8;
+}
+
+.about-hero-side {
+  position: relative;
+
+  z-index: 2;
+
+  align-self: flex-end;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+  padding-bottom: 5px;
+}
+
+.about-hero-side span {
+  color: #77736f;
+
+  font-size: 9px;
+
+  letter-spacing: 0.18em;
+}
+
+
+/* =========================================
+   STORY
+========================================= */
+
+.about-story {
+  padding: 120px 7vw;
+
+  border-bottom: 1px solid #292929;
+}
+
+.about-section-label {
+  margin-bottom: 60px;
+
+  color: #6b1118;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.2em;
+}
+
+.about-story-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 0.8fr;
+
+  gap: 100px;
+}
+
+.about-story-heading h2 {
+  margin: 0;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: clamp(55px, 7vw, 105px);
+
+  line-height: 0.88;
+
+  letter-spacing: -0.065em;
+}
+
+.about-story-content {
+  max-width: 500px;
+}
+
+.about-story-content p {
+  margin: 0 0 25px;
+
+  color: #a7a3a0;
+
+  font-size: 14px;
+
+  line-height: 1.9;
+}
+
+.about-story-content .about-lead {
+  margin-bottom: 35px;
+
+  color: #f4f1ec;
+
+  font-size: 18px;
+
+  line-height: 1.7;
+}
+
+
+/* =========================================
+   FOCUS
+========================================= */
+
+.about-focus {
+  padding: 120px 7vw;
+
+  border-bottom: 1px solid #292929;
+}
+
+.about-focus-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  border-top: 1px solid #292929;
+}
+
+.about-focus-card {
+  min-height: 310px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  padding: 28px;
+
+  border-right: 1px solid #292929;
+
+  background: #080808;
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.about-focus-card:last-child {
+  border-right: 0;
+}
+
+.about-focus-card:hover {
+  background: #0d0d0d;
+}
+
+.about-focus-card > span {
+  color: #6b1118;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: 11px;
+}
+
+.about-focus-card h3 {
+  margin: 0 0 18px;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: 27px;
+
+  letter-spacing: -0.035em;
+}
+
+.about-focus-card p {
+  max-width: 300px;
+
+  margin: 0;
+
+  color: #77736f;
+
+  font-size: 13px;
+
+  line-height: 1.8;
+}
+
+
+/* =========================================
+   PRODUCT APPROACH
+========================================= */
+
+.about-product {
+  position: relative;
+
+  min-height: 650px;
+
+  display: flex;
+
+  align-items: center;
+
+  padding: 110px 7vw;
+
+  overflow: hidden;
+
+  border-bottom: 1px solid #292929;
+}
+
+.about-product-number {
+  position: absolute;
+
+  right: 5vw;
+  bottom: -80px;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: clamp(300px, 40vw, 600px);
+
+  font-weight: 600;
+
+  line-height: 0.8;
+
+  letter-spacing: -0.1em;
+
+  color: #6b1118;
+
+  opacity: 0.12;
+}
+
+.about-product-content {
+  position: relative;
+
+  z-index: 2;
+
+  max-width: 850px;
+}
+
+.about-product-content .about-section-label {
+  margin-bottom: 35px;
+}
+
+.about-product-content h2 {
+  margin: 0 0 35px;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: clamp(55px, 8vw, 120px);
+
+  line-height: 0.86;
+
+  letter-spacing: -0.07em;
+}
+
+.about-product-content > p {
+  max-width: 480px;
+
+  margin: 0 0 18px;
+
+  color: #a7a3a0;
+
+  font-size: 14px;
+
+  line-height: 1.85;
+}
+
+
+/* =========================================
+   DROP 01
+========================================= */
+
+.about-drop {
+  padding: 100px 7vw 120px;
+
+  border-bottom: 1px solid #292929;
+}
+
+.about-drop-top {
+  display: flex;
+
+  justify-content: space-between;
+
+  padding-bottom: 30px;
+
+  border-bottom: 1px solid #292929;
+
+  color: #77736f;
+
+  font-size: 9px;
+
+  letter-spacing: 0.18em;
+}
+
+.about-drop-content {
+  display: grid;
+
+  grid-template-columns: 1.2fr 0.8fr;
+
+  gap: 100px;
+
+  padding-top: 80px;
+}
+
+.about-drop-label {
+  margin: 0 0 25px;
+
+  color: #6b1118;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.2em;
+}
+
+.about-drop-content h2 {
+  margin: 0;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: clamp(80px, 12vw, 175px);
+
+  line-height: 0.78;
+
+  letter-spacing: -0.08em;
+}
+
+.about-drop-copy {
+  max-width: 430px;
+
+  align-self: end;
+}
+
+.about-drop-copy p {
+  margin: 0 0 25px;
+
+  color: #a7a3a0;
+
+  font-size: 14px;
+
+  line-height: 1.85;
+}
+
+.about-button {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 10px;
+
+  padding: 15px 22px;
+
+  background: #6b1118;
+
+  color: #f4f1ec;
+
+  text-decoration: none;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.15em;
+
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.about-button:hover {
+  background: #8f1d26;
+
+  transform: translateY(-2px);
+}
+
+
+/* =========================================
+   FINAL
+========================================= */
+
+.about-final {
+  min-height: 650px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 100px 20px;
+}
+
+.about-final-label {
+  margin: 0 0 30px;
+
+  color: #6b1118;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.2em;
+}
+
+.about-final h2 {
+  margin: 0;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: clamp(70px, 11vw, 165px);
+
+  line-height: 0.8;
+
+  letter-spacing: -0.075em;
+}
+
+.about-final > p:not(.about-final-label) {
+  max-width: 360px;
+
+  margin: 35px 0 0;
+
+  color: #77736f;
+
+  font-size: 13px;
+
+  line-height: 1.8;
+}
+
+.about-final-button {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 35px;
+
+  padding: 16px 24px;
+
+  border: 1px solid #6b1118;
+
+  color: #f4f1ec;
+
+  text-decoration: none;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.15em;
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.about-final-button:hover {
+  background: #6b1118;
+
+  border-color: #6b1118;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 900px) {
+
+  .about-hero {
+    padding: 80px 5vw;
+  }
+
+  .about-story,
+  .about-focus,
+  .about-product,
+  .about-drop {
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+
+  .about-story-grid {
+    gap: 50px;
+  }
+
+  .about-drop-content {
+    gap: 50px;
+  }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 650px) {
+
+  .about-hero {
+    min-height: 620px;
+
+    align-items: flex-start;
+
+    padding: 65px 20px;
+  }
+
+  .about-hero h1 {
+    font-size: 70px;
+  }
+
+  .about-hero-text {
+    max-width: 290px;
+
+    margin-top: 35px;
+
+    font-size: 12px;
+  }
+
+  .about-hero-side {
+    position: absolute;
+
+    left: 20px;
+    bottom: 30px;
+
+    flex-direction: row;
+
+    gap: 20px;
+  }
+
+
+  .about-story {
+    padding: 75px 20px;
+  }
+
+  .about-section-label {
+    margin-bottom: 40px;
+  }
+
+  .about-story-grid {
+    grid-template-columns: 1fr;
+
+    gap: 45px;
+  }
+
+  .about-story-heading h2 {
+    font-size: 52px;
+  }
+
+  .about-story-content .about-lead {
+    font-size: 16px;
+  }
+
+
+  .about-focus {
+    padding: 75px 20px;
+  }
+
+  .about-focus-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-focus-card {
+    min-height: 250px;
+
+    border-right: 0;
+
+    border-bottom: 1px solid #292929;
+  }
+
+  .about-focus-card:last-child {
+    border-bottom: 0;
+  }
+
+
+  .about-product {
+    min-height: 580px;
+
+    padding: 75px 20px;
+  }
+
+  .about-product-content h2 {
+    font-size: 55px;
+  }
+
+
+  .about-drop {
+    padding: 70px 20px 80px;
+  }
+
+  .about-drop-content {
+    grid-template-columns: 1fr;
+
+    gap: 50px;
+
+    padding-top: 55px;
+  }
+
+  .about-drop-content h2 {
+    font-size: 85px;
+  }
+
+
+  .about-final {
+    min-height: 560px;
+
+    padding: 80px 20px;
+  }
+
+  .about-final h2 {
+    font-size: 72px;
+  }
+}
+
+
+@media (max-width: 400px) {
+
+  .about-hero h1 {
+    font-size: 62px;
+  }
+
+  .about-story-heading h2 {
+    font-size: 46px;
+  }
+
+  .about-product-content h2 {
+    font-size: 48px;
+  }
+
+  .about-drop-content h2 {
+    font-size: 72px;
+  }
+
+  .about-final h2 {
+    font-size: 64px;
+  }
+}
