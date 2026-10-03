@@ -1,5 +1,6 @@
 const Product = require("../models/Product");
 const Order = require("../models/Order");
+const PendingPayment = require("../models/PendingPayment");
 
 const razorpay = require("../config/razorpay");
 
@@ -10,6 +11,10 @@ const crypto = require("crypto");
 // CREATE ORDER
 // =========================================
 
+// =========================================
+// CREATE RAZORPAY PAYMENT
+// =========================================
+
 const createOrder = async (req, res) => {
   try {
     const {
@@ -17,7 +22,6 @@ const createOrder = async (req, res) => {
       shippingAddress,
       items,
     } = req.body;
-
 
     // ---------------------------------------
     // VALIDATION
@@ -31,14 +35,12 @@ const createOrder = async (req, res) => {
       });
     }
 
-
     if (!items.length) {
       return res.status(400).json({
         success: false,
         message: "Your cart is empty",
       });
     }
-
 
     // ---------------------------------------
     // GET PRODUCTS FROM DATABASE
@@ -48,15 +50,12 @@ const createOrder = async (req, res) => {
       (item) => item.productId
     );
 
-
     const products = await Product.find({
       productId: {
         $in: productIds,
       },
-
       available: true,
     });
-
 
     if (products.length !== items.length) {
       return res.status(400).json({
@@ -66,20 +65,17 @@ const createOrder = async (req, res) => {
       });
     }
 
-
     // ---------------------------------------
-    // BUILD ORDER ITEMS
+    // BUILD TRUSTED ITEMS
     // ---------------------------------------
 
     const orderItems = [];
-
 
     for (const item of items) {
       const product = products.find(
         (product) =>
           product.productId === item.productId
       );
-
 
       if (!product) {
         return res.status(400).json({
@@ -89,7 +85,6 @@ const createOrder = async (req, res) => {
         });
       }
 
-
       const validSizes = [
         "S",
         "M",
@@ -97,7 +92,6 @@ const createOrder = async (req, res) => {
         "XL",
         "XXL",
       ];
-
 
       if (!validSizes.includes(item.size)) {
         return res.status(400).json({
@@ -107,9 +101,7 @@ const createOrder = async (req, res) => {
         });
       }
 
-
       const quantity = Number(item.quantity);
-
 
       if (
         !Number.isInteger(quantity) ||
@@ -122,161 +114,111 @@ const createOrder = async (req, res) => {
         });
       }
 
-
       orderItems.push({
         productId: product.productId,
-
-        name: product.name,
-
-        price: product.price,
-
         size: item.size,
-
         quantity,
-
-        image: product.image,
       });
     }
 
-
     // ---------------------------------------
-    // CALCULATE TOTAL
+    // CALCULATE TRUSTED TOTAL
     // ---------------------------------------
 
-    const subtotal = orderItems.reduce(
-      (total, item) =>
-        total +
-        item.price * item.quantity,
+    const subtotal = products.reduce(
+      (total, product) => {
+        const matchingItems = items.filter(
+          (item) =>
+            item.productId === product.productId
+        );
 
+        return (
+          total +
+          matchingItems.reduce(
+            (itemTotal, item) =>
+              itemTotal +
+              product.price *
+                Number(item.quantity),
+            0
+          )
+        );
+      },
       0
     );
 
-
     const shipping = 0;
-
     const total = subtotal + shipping;
-
-
-    // ---------------------------------------
-    // CREATE INTERNAL ORDER NUMBER
-    // ---------------------------------------
-
-    const orderNumber =
-      `ZANHOD-${Date.now()}-${Math.floor(
-        Math.random() * 1000
-      )}`;
-
-
-    // ---------------------------------------
-    // CREATE MONGODB ORDER
-    // ---------------------------------------
-
-    const order = await Order.create({
-      orderNumber,
-
-      customer: {
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone,
-      },
-
-      shippingAddress: {
-        address: shippingAddress.address,
-        city: shippingAddress.city,
-        state: shippingAddress.state,
-        pincode: shippingAddress.pincode,
-      },
-
-      items: orderItems,
-
-      subtotal,
-
-      shipping,
-
-      total,
-
-      paymentStatus: "pending",
-
-      orderStatus: "placed",
-
-      // -----------------------------------
-      // INITIAL STATUS HISTORY
-      // -----------------------------------
-
-      statusHistory: [
-        {
-          status: "placed",
-          note: "Order placed successfully",
-          changedAt: new Date(),
-        },
-      ],
-
-      paymentMethod: "razorpay",
-    });
-
 
     // ---------------------------------------
     // CREATE RAZORPAY ORDER
     // ---------------------------------------
 
+    const receipt =
+      `ZANHOD-${Date.now()}-${Math.floor(
+        Math.random() * 1000
+      )}`;
+
     const razorpayOrder =
       await razorpay.orders.create({
         amount: total * 100,
-
         currency: "INR",
-
-        receipt: orderNumber,
+        receipt,
 
         notes: {
-          zanhodOrderId:
-            order._id.toString(),
+          store: "ZANHOD",
         },
       });
 
-
     // ---------------------------------------
-    // SAVE RAZORPAY ORDER ID
+    // SAVE CHECKOUT AS PENDING PAYMENT
+    // NOT AS AN ACTUAL ORDER
     // ---------------------------------------
 
-    order.razorpayOrderId =
-      razorpayOrder.id;
+    const pendingPayment =
+      await PendingPayment.create({
+        razorpayOrderId:
+          razorpayOrder.id,
 
-    await order.save();
+        customer: {
+          name: customer.name,
+          email: customer.email,
+          phone: customer.phone,
+        },
 
+        shippingAddress: {
+          address: shippingAddress.address,
+          city: shippingAddress.city,
+          state: shippingAddress.state,
+          pincode: shippingAddress.pincode,
+        },
+
+        items: orderItems,
+
+        subtotal,
+        shipping,
+        total,
+
+        status: "pending",
+      });
 
     // ---------------------------------------
     // RESPONSE
     // ---------------------------------------
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
 
       message:
-        "Order created successfully",
+        "Payment session created",
 
       order: {
-        id: order._id,
-
-        orderNumber:
-          order.orderNumber,
-
-        subtotal:
-          order.subtotal,
-
-        shipping:
-          order.shipping,
-
-        total:
-          order.total,
-
-        paymentStatus:
-          order.paymentStatus,
-
-        orderStatus:
-          order.orderStatus,
+        pendingPaymentId:
+          pendingPayment._id,
 
         razorpayOrderId:
           razorpayOrder.id,
+
+        total,
 
         razorpayKeyId:
           process.env.RAZORPAY_KEY_ID,
@@ -284,21 +226,89 @@ const createOrder = async (req, res) => {
     });
 
   } catch (error) {
-
     console.error(
-      "Create order error:",
+      "Create payment error:",
       error
     );
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-
       message:
-        "Failed to create order",
+        "Failed to create payment",
     });
   }
 };
 
+
+
+// =========================================
+// BUILD FINAL ORDER ITEMS
+// =========================================
+
+const buildFinalOrderItems = async (
+  pendingItems
+) => {
+  const productIds =
+    pendingItems.map(
+      (item) => item.productId
+    );
+
+  const products =
+    await Product.find({
+      productId: {
+        $in: productIds,
+      },
+      available: true,
+    });
+
+  if (
+    products.length !==
+    pendingItems.length
+  ) {
+    throw new Error(
+      "One or more products are no longer available"
+    );
+  }
+
+  return pendingItems.map((item) => {
+    const product =
+      products.find(
+        (product) =>
+          product.productId ===
+          item.productId
+      );
+
+    if (!product) {
+      throw new Error(
+        `Product ${item.productId} not found`
+      );
+    }
+
+    return {
+      productId:
+        product.productId,
+
+      name:
+        product.name,
+
+      price:
+        product.price,
+
+      size:
+        item.size,
+
+      quantity:
+        item.quantity,
+
+      image:
+        product.image,
+    };
+  });
+};
+
+// =========================================
+// VERIFY RAZORPAY PAYMENT
+// =========================================
 
 // =========================================
 // VERIFY RAZORPAY PAYMENT
@@ -311,7 +321,6 @@ const verifyPayment = async (req, res) => {
       razorpay_payment_id,
       razorpay_signature,
     } = req.body;
-
 
     // ---------------------------------------
     // CHECK REQUIRED VALUES
@@ -329,42 +338,38 @@ const verifyPayment = async (req, res) => {
       });
     }
 
-
     // ---------------------------------------
-    // FIND OUR MONGODB ORDER
+    // FIND PENDING PAYMENT
     // ---------------------------------------
 
-    const order = await Order.findOne({
-      razorpayOrderId: razorpay_order_id,
-    });
+    const pendingPayment =
+      await PendingPayment.findOne({
+        razorpayOrderId:
+          razorpay_order_id,
+      });
 
-
-    if (!order) {
+    if (!pendingPayment) {
       return res.status(404).json({
         success: false,
-        message: "Order not found",
+        message:
+          "Payment session not found or expired",
       });
     }
 
-
     // ---------------------------------------
-    // CREATE SIGNATURE
+    // VERIFY RAZORPAY SIGNATURE
     // ---------------------------------------
 
-    const generatedSignature = crypto
-      .createHmac(
-        "sha256",
-        process.env.RAZORPAY_KEY_SECRET
-      )
-      .update(
-        `${razorpay_order_id}|${razorpay_payment_id}`
-      )
-      .digest("hex");
-
-
-    // ---------------------------------------
-    // COMPARE SIGNATURES
-    // ---------------------------------------
+    const generatedSignature =
+      crypto
+        .createHmac(
+          "sha256",
+          process.env.RAZORPAY_KEY_SECRET
+        )
+        .update(
+          `${razorpay_order_id}|${razorpay_payment_id}`
+        )
+        .digest("hex");
 
     if (
       generatedSignature !==
@@ -377,77 +382,110 @@ const verifyPayment = async (req, res) => {
       });
     }
 
-
     // ---------------------------------------
     // PREVENT DUPLICATE VERIFICATION
     // ---------------------------------------
 
-    if (order.paymentStatus === "paid") {
-      return res.status(200).json({
-        success: true,
-        message:
-          "Payment already verified",
-
-        order: {
-          orderNumber:
-            order.orderNumber,
-
-          paymentStatus:
-            order.paymentStatus,
-
-          orderStatus:
-            order.orderStatus,
-
-          statusHistory:
-            order.statusHistory || [],
-        },
-      });
-    }
-
-
-    // ---------------------------------------
-    // PAYMENT IS VERIFIED
-    // ---------------------------------------
-
-    order.paymentStatus = "paid";
-
-    order.paymentMethod = "razorpay";
-
-    order.razorpayPaymentId =
-      razorpay_payment_id;
-
-
-    // ---------------------------------------
-    // MOVE ORDER TO CONFIRMED
-    // ---------------------------------------
-
-    const previousStatus =
-      order.orderStatus;
-
-    order.orderStatus = "confirmed";
-
-
-    // ---------------------------------------
-    // ADD CONFIRMED STATUS HISTORY
-    // ---------------------------------------
-
     if (
-      previousStatus !== "confirmed"
+      pendingPayment.status ===
+      "completed"
     ) {
-      order.statusHistory =
-        order.statusHistory || [];
-
-      order.statusHistory.push({
-        status: "confirmed",
-        note:
-          "Payment verified successfully",
-        changedAt: new Date(),
+      return res.status(400).json({
+        success: false,
+        message:
+          "Payment has already been processed",
       });
     }
 
+    // ---------------------------------------
+    // CREATE REAL ORDER
+    // ---------------------------------------
 
-    await order.save();
+    const orderNumber =
+      `ZANHOD-${Date.now()}-${Math.floor(
+        Math.random() * 1000
+      )}`;
 
+    const order =
+      await Order.create({
+        orderNumber,
+
+        customer: {
+          name:
+            pendingPayment.customer.name,
+
+          email:
+            pendingPayment.customer.email,
+
+          phone:
+            pendingPayment.customer.phone,
+        },
+
+        shippingAddress: {
+          address:
+            pendingPayment.shippingAddress.address,
+
+          city:
+            pendingPayment.shippingAddress.city,
+
+          state:
+            pendingPayment.shippingAddress.state,
+
+          pincode:
+            pendingPayment.shippingAddress.pincode,
+        },
+
+        items:
+          await buildFinalOrderItems(
+            pendingPayment.items
+          ),
+
+        subtotal:
+          pendingPayment.subtotal,
+
+        shipping:
+          pendingPayment.shipping,
+
+        total:
+          pendingPayment.total,
+
+        paymentStatus: "paid",
+
+        orderStatus: "confirmed",
+
+        statusHistory: [
+          {
+            status: "placed",
+            note:
+              "Order placed successfully",
+            changedAt: new Date(),
+          },
+
+          {
+            status: "confirmed",
+            note:
+              "Payment verified successfully",
+            changedAt: new Date(),
+          },
+        ],
+
+        paymentMethod: "razorpay",
+
+        razorpayOrderId:
+          razorpay_order_id,
+
+        razorpayPaymentId:
+          razorpay_payment_id,
+      });
+
+    // ---------------------------------------
+    // MARK PENDING PAYMENT COMPLETE
+    // ---------------------------------------
+
+    pendingPayment.status =
+      "completed";
+
+    await pendingPayment.save();
 
     // ---------------------------------------
     // RESPONSE
@@ -477,7 +515,6 @@ const verifyPayment = async (req, res) => {
     });
 
   } catch (error) {
-
     console.error(
       "Payment verification error:",
       error
@@ -485,7 +522,6 @@ const verifyPayment = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-
       message:
         "Payment verification failed",
     });
