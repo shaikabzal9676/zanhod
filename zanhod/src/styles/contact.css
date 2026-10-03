@@ -1,0 +1,167 @@
+.contact-page {
+  min-height: 100vh;
+  background: #080808;
+  color: #f4f1ec;
+  padding: 150px 7vw 100px;
+}
+
+.contact-hero {
+  max-width: 850px;
+  margin-bottom: 80px;
+}
+
+.contact-eyebrow {
+  color: #8f1d26;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  margin-bottom: 22px;
+}
+
+.contact-hero h1 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(3rem, 7vw, 7rem);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  margin: 0 0 30px;
+}
+
+.contact-intro {
+  max-width: 620px;
+  color: #a7a3a0;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid #292929;
+  border-bottom: 1px solid #292929;
+}
+
+.contact-card {
+  min-height: 260px;
+  padding: 42px 34px;
+  color: #f4f1ec;
+  text-decoration: none;
+  border-right: 1px solid #292929;
+  transition: background 0.3s ease;
+}
+
+.contact-card:last-child {
+  border-right: none;
+}
+
+.contact-card:hover {
+  background: #121212;
+}
+
+.contact-card svg {
+  margin-bottom: 65px;
+  color: #8f1d26;
+}
+
+.contact-label {
+  color: #77736f;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  margin-bottom: 10px;
+}
+
+.contact-card h2 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 22px;
+  margin: 0 0 8px;
+}
+
+.contact-card span {
+  color: #a7a3a0;
+  font-size: 13px;
+}
+
+.contact-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  padding-top: 100px;
+}
+
+.contact-info h2 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(2rem, 4vw, 4rem);
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+.contact-links {
+  border-top: 1px solid #292929;
+}
+
+.contact-links a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 0;
+  color: #f4f1ec;
+  text-decoration: none;
+  border-bottom: 1px solid #292929;
+  font-size: 14px;
+  transition: color 0.25s ease;
+}
+
+.contact-links a:hover {
+  color: #8f1d26;
+}
+
+.contact-links span {
+  font-size: 20px;
+}
+
+@media (max-width: 800px) {
+  .contact-page {
+    padding: 120px 6vw 70px;
+  }
+
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-card {
+    border-right: none;
+    border-bottom: 1px solid #292929;
+  }
+
+  .contact-card:last-child {
+    border-bottom: none;
+  }
+
+  .contact-info {
+    grid-template-columns: 1fr;
+    gap: 45px;
+    padding-top: 70px;
+  }
+}
+
+@media (max-width: 500px) {
+  .contact-page {
+    padding: 105px 5vw 60px;
+  }
+
+  .contact-hero {
+    margin-bottom: 55px;
+  }
+
+  .contact-hero h1 {
+    font-size: 3rem;
+  }
+
+  .contact-card {
+    min-height: 220px;
+    padding: 30px 24px;
+  }
+
+  .contact-card svg {
+    margin-bottom: 45px;
+  }
+}
