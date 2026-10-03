@@ -6,10 +6,51 @@ const razorpay = require("../config/razorpay");
 
 const crypto = require("crypto");
 
+// =========================================
+// CONSTANTS
+// =========================================
+
+const VALID_SIZES = [
+  "S",
+  "M",
+  "L",
+  "XL",
+  "XXL",
+];
+
+const VALID_ORDER_STATUSES = [
+  "placed",
+  "confirmed",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled",
+];
 
 // =========================================
-// CREATE ORDER
+// HELPERS
 // =========================================
+
+const createOrderNumber = () => {
+  return `ZANHOD-${Date.now()}-${crypto
+    .randomBytes(3)
+    .toString("hex")
+    .toUpperCase()}`;
+};
+
+const createReceipt = () => {
+  return `ZANHOD-${Date.now()}-${crypto
+    .randomBytes(3)
+    .toString("hex")
+    .toUpperCase()}`;
+};
+
+const escapeRegex = (value) => {
+  return value.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&"
+  );
+};
 
 // =========================================
 // CREATE RAZORPAY PAYMENT
@@ -24,10 +65,15 @@ const createOrder = async (req, res) => {
     } = req.body;
 
     // ---------------------------------------
-    // VALIDATION
+    // BASIC VALIDATION
     // ---------------------------------------
 
-    if (!customer || !shippingAddress || !items) {
+    if (
+      !customer ||
+      !shippingAddress ||
+      !Array.isArray(items) ||
+      items.length === 0
+    ) {
       return res.status(400).json({
         success: false,
         message:
@@ -35,34 +81,91 @@ const createOrder = async (req, res) => {
       });
     }
 
-    if (!items.length) {
+    // ---------------------------------------
+    // CUSTOMER VALIDATION
+    // ---------------------------------------
+
+    if (
+      !customer.name ||
+      !customer.email ||
+      !customer.phone
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Your cart is empty",
+        message:
+          "Customer name, email and phone are required",
       });
     }
 
     // ---------------------------------------
-    // GET PRODUCTS FROM DATABASE
+    // SHIPPING VALIDATION
+    // ---------------------------------------
+
+    if (
+      !shippingAddress.address ||
+      !shippingAddress.city ||
+      !shippingAddress.state ||
+      !shippingAddress.pincode
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Complete shipping address is required",
+      });
+    }
+
+    // ---------------------------------------
+    // PRODUCT IDS
     // ---------------------------------------
 
     const productIds = items.map(
       (item) => item.productId
     );
 
+    // ---------------------------------------
+    // UNIQUE PRODUCT IDS
+    // ---------------------------------------
+    // Important:
+    // Same product can exist with different sizes.
+
+    const uniqueProductIds = [
+      ...new Set(productIds),
+    ];
+
+    // ---------------------------------------
+    // GET PRODUCTS
+    // ---------------------------------------
+
     const products = await Product.find({
       productId: {
-        $in: productIds,
+        $in: uniqueProductIds,
       },
+
       available: true,
     });
 
-    if (products.length !== items.length) {
+    if (
+      products.length !==
+      uniqueProductIds.length
+    ) {
       return res.status(400).json({
         success: false,
         message:
           "One or more products are unavailable",
       });
+    }
+
+    // ---------------------------------------
+    // PRODUCT MAP
+    // ---------------------------------------
+
+    const productMap = new Map();
+
+    for (const product of products) {
+      productMap.set(
+        product.productId,
+        product
+      );
     }
 
     // ---------------------------------------
@@ -72,9 +175,8 @@ const createOrder = async (req, res) => {
     const orderItems = [];
 
     for (const item of items) {
-      const product = products.find(
-        (product) =>
-          product.productId === item.productId
+      const product = productMap.get(
+        item.productId
       );
 
       if (!product) {
@@ -85,15 +187,13 @@ const createOrder = async (req, res) => {
         });
       }
 
-      const validSizes = [
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL",
-      ];
+      // -------------------------------------
+      // SIZE
+      // -------------------------------------
 
-      if (!validSizes.includes(item.size)) {
+      if (
+        !VALID_SIZES.includes(item.size)
+      ) {
         return res.status(400).json({
           success: false,
           message:
@@ -101,7 +201,13 @@ const createOrder = async (req, res) => {
         });
       }
 
-      const quantity = Number(item.quantity);
+      // -------------------------------------
+      // QUANTITY
+      // -------------------------------------
+
+      const quantity = Number(
+        item.quantity
+      );
 
       if (
         !Number.isInteger(quantity) ||
@@ -115,53 +221,56 @@ const createOrder = async (req, res) => {
       }
 
       orderItems.push({
-        productId: product.productId,
+        productId:
+          product.productId,
+
         size: item.size,
+
         quantity,
       });
     }
 
     // ---------------------------------------
-    // CALCULATE TRUSTED TOTAL
+    // CALCULATE TRUSTED SUBTOTAL
     // ---------------------------------------
 
-    const subtotal = products.reduce(
-      (total, product) => {
-        const matchingItems = items.filter(
-          (item) =>
-            item.productId === product.productId
-        );
+    const subtotal =
+      orderItems.reduce(
+        (total, item) => {
+          const product =
+            productMap.get(
+              item.productId
+            );
 
-        return (
-          total +
-          matchingItems.reduce(
-            (itemTotal, item) =>
-              itemTotal +
-              product.price *
-                Number(item.quantity),
-            0
-          )
-        );
-      },
-      0
-    );
+          return (
+            total +
+            product.price *
+              item.quantity
+          );
+        },
+        0
+      );
 
     const shipping = 0;
-    const total = subtotal + shipping;
+
+    const total =
+      subtotal + shipping;
 
     // ---------------------------------------
     // CREATE RAZORPAY ORDER
     // ---------------------------------------
 
     const receipt =
-      `ZANHOD-${Date.now()}-${Math.floor(
-        Math.random() * 1000
-      )}`;
+      createReceipt();
 
     const razorpayOrder =
       await razorpay.orders.create({
-        amount: total * 100,
+        amount: Math.round(
+          total * 100
+        ),
+
         currency: "INR",
+
         receipt,
 
         notes: {
@@ -170,8 +279,7 @@ const createOrder = async (req, res) => {
       });
 
     // ---------------------------------------
-    // SAVE CHECKOUT AS PENDING PAYMENT
-    // NOT AS AN ACTUAL ORDER
+    // SAVE PENDING PAYMENT
     // ---------------------------------------
 
     const pendingPayment =
@@ -180,22 +288,46 @@ const createOrder = async (req, res) => {
           razorpayOrder.id,
 
         customer: {
-          name: customer.name,
-          email: customer.email,
-          phone: customer.phone,
+          name:
+            String(customer.name).trim(),
+
+          email:
+            String(customer.email)
+              .trim()
+              .toLowerCase(),
+
+          phone:
+            String(customer.phone).trim(),
         },
 
         shippingAddress: {
-          address: shippingAddress.address,
-          city: shippingAddress.city,
-          state: shippingAddress.state,
-          pincode: shippingAddress.pincode,
+          address:
+            String(
+              shippingAddress.address
+            ).trim(),
+
+          city:
+            String(
+              shippingAddress.city
+            ).trim(),
+
+          state:
+            String(
+              shippingAddress.state
+            ).trim(),
+
+          pincode:
+            String(
+              shippingAddress.pincode
+            ).trim(),
         },
 
         items: orderItems,
 
         subtotal,
+
         shipping,
+
         total,
 
         status: "pending",
@@ -224,7 +356,6 @@ const createOrder = async (req, res) => {
           process.env.RAZORPAY_KEY_ID,
       },
     });
-
   } catch (error) {
     console.error(
       "Create payment error:",
@@ -233,13 +364,12 @@ const createOrder = async (req, res) => {
 
     return res.status(500).json({
       success: false,
+
       message:
         "Failed to create payment",
     });
   }
 };
-
-
 
 // =========================================
 // BUILD FINAL ORDER ITEMS
@@ -248,34 +378,69 @@ const createOrder = async (req, res) => {
 const buildFinalOrderItems = async (
   pendingItems
 ) => {
+  // ---------------------------------------
+  // UNIQUE PRODUCT IDS
+  // ---------------------------------------
+
   const productIds =
     pendingItems.map(
       (item) => item.productId
     );
 
+  const uniqueProductIds = [
+    ...new Set(productIds),
+  ];
+
+  // ---------------------------------------
+  // GET PRODUCTS
+  // ---------------------------------------
+  // We intentionally do NOT require
+  // available:true here.
+  //
+  // The payment session was already created
+  // when the product was available.
+  //
+  // This prevents a product being disabled
+  // between payment and verification from
+  // causing a paid order to fail.
+
   const products =
     await Product.find({
       productId: {
-        $in: productIds,
+        $in: uniqueProductIds,
       },
-      available: true,
     });
 
   if (
     products.length !==
-    pendingItems.length
+    uniqueProductIds.length
   ) {
     throw new Error(
-      "One or more products are no longer available"
+      "One or more products no longer exist"
     );
   }
 
+  // ---------------------------------------
+  // PRODUCT MAP
+  // ---------------------------------------
+
+  const productMap = new Map();
+
+  for (const product of products) {
+    productMap.set(
+      product.productId,
+      product
+    );
+  }
+
+  // ---------------------------------------
+  // BUILD FINAL ITEMS
+  // ---------------------------------------
+
   return pendingItems.map((item) => {
     const product =
-      products.find(
-        (product) =>
-          product.productId ===
-          item.productId
+      productMap.get(
+        item.productId
       );
 
     if (!product) {
@@ -310,11 +475,10 @@ const buildFinalOrderItems = async (
 // VERIFY RAZORPAY PAYMENT
 // =========================================
 
-// =========================================
-// VERIFY RAZORPAY PAYMENT
-// =========================================
-
-const verifyPayment = async (req, res) => {
+const verifyPayment = async (
+  req,
+  res
+) => {
   try {
     const {
       razorpay_order_id,
@@ -323,7 +487,7 @@ const verifyPayment = async (req, res) => {
     } = req.body;
 
     // ---------------------------------------
-    // CHECK REQUIRED VALUES
+    // REQUIRED VALUES
     // ---------------------------------------
 
     if (
@@ -357,7 +521,7 @@ const verifyPayment = async (req, res) => {
     }
 
     // ---------------------------------------
-    // VERIFY RAZORPAY SIGNATURE
+    // VERIFY SIGNATURE
     // ---------------------------------------
 
     const generatedSignature =
@@ -371,10 +535,24 @@ const verifyPayment = async (req, res) => {
         )
         .digest("hex");
 
+    let signatureValid = false;
+
     if (
-      generatedSignature !==
-      razorpay_signature
+      generatedSignature.length ===
+      razorpay_signature.length
     ) {
+      signatureValid =
+        crypto.timingSafeEqual(
+          Buffer.from(
+            generatedSignature
+          ),
+          Buffer.from(
+            razorpay_signature
+          )
+        );
+    }
+
+    if (!signatureValid) {
       return res.status(400).json({
         success: false,
         message:
@@ -383,113 +561,405 @@ const verifyPayment = async (req, res) => {
     }
 
     // ---------------------------------------
-    // PREVENT DUPLICATE VERIFICATION
+    // FETCH ACTUAL RAZORPAY PAYMENT
+    // ---------------------------------------
+
+    const payment =
+      await razorpay.payments.fetch(
+        razorpay_payment_id
+      );
+
+    // ---------------------------------------
+    // VERIFY PAYMENT BELONGS TO ORDER
     // ---------------------------------------
 
     if (
-      pendingPayment.status ===
-      "completed"
+      payment.order_id !==
+      razorpay_order_id
     ) {
       return res.status(400).json({
         success: false,
         message:
-          "Payment has already been processed",
+          "Payment does not belong to this order",
       });
     }
 
     // ---------------------------------------
-    // CREATE REAL ORDER
+    // VERIFY PAYMENT STATUS
     // ---------------------------------------
 
-    const orderNumber =
-      `ZANHOD-${Date.now()}-${Math.floor(
-        Math.random() * 1000
-      )}`;
+    if (
+      payment.status !== "captured"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Payment has not been captured",
+      });
+    }
 
-    const order =
-      await Order.create({
-        orderNumber,
+    // ---------------------------------------
+    // EXPECTED AMOUNT
+    // ---------------------------------------
 
-        customer: {
-          name:
-            pendingPayment.customer.name,
+    const expectedAmount =
+      Math.round(
+        Number(
+          pendingPayment.total
+        ) * 100
+      );
 
-          email:
-            pendingPayment.customer.email,
+    // ---------------------------------------
+    // VERIFY PAYMENT AMOUNT
+    // ---------------------------------------
 
-          phone:
-            pendingPayment.customer.phone,
-        },
+    if (
+      Number(payment.amount) !==
+      expectedAmount
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Payment amount does not match the order",
+      });
+    }
 
-        shippingAddress: {
-          address:
-            pendingPayment.shippingAddress.address,
+    // ---------------------------------------
+    // VERIFY PAYMENT CURRENCY
+    // ---------------------------------------
 
-          city:
-            pendingPayment.shippingAddress.city,
+    if (
+      payment.currency !== "INR"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid payment currency",
+      });
+    }
 
-          state:
-            pendingPayment.shippingAddress.state,
+    // ---------------------------------------
+    // FETCH RAZORPAY ORDER
+    // ---------------------------------------
 
-          pincode:
-            pendingPayment.shippingAddress.pincode,
-        },
+    const razorpayOrder =
+      await razorpay.orders.fetch(
+        razorpay_order_id
+      );
 
-        items:
-          await buildFinalOrderItems(
-            pendingPayment.items
-          ),
+    // ---------------------------------------
+    // VERIFY RAZORPAY ORDER AMOUNT
+    // ---------------------------------------
 
-        subtotal:
-          pendingPayment.subtotal,
+    if (
+      Number(
+        razorpayOrder.amount
+      ) !== expectedAmount
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Razorpay order amount does not match",
+      });
+    }
 
-        shipping:
-          pendingPayment.shipping,
+    // ---------------------------------------
+    // VERIFY RAZORPAY ORDER CURRENCY
+    // ---------------------------------------
 
-        total:
-          pendingPayment.total,
+    if (
+      razorpayOrder.currency !==
+      "INR"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Razorpay order currency is invalid",
+      });
+    }
 
-        paymentStatus: "paid",
+    // =======================================
+    // IDEMPOTENCY CHECK
+    // =======================================
 
-        orderStatus: "confirmed",
+    // ---------------------------------------
+    // PAYMENT ID ALREADY USED?
+    // ---------------------------------------
 
-        statusHistory: [
-          {
-            status: "placed",
-            note:
-              "Order placed successfully",
-            changedAt: new Date(),
-          },
-
-          {
-            status: "confirmed",
-            note:
-              "Payment verified successfully",
-            changedAt: new Date(),
-          },
-        ],
-
-        paymentMethod: "razorpay",
-
-        razorpayOrderId:
-          razorpay_order_id,
-
+    const existingPaymentOrder =
+      await Order.findOne({
         razorpayPaymentId:
           razorpay_payment_id,
       });
 
+    if (existingPaymentOrder) {
+      if (
+        pendingPayment.status !==
+        "completed"
+      ) {
+        pendingPayment.status =
+          "completed";
+
+        await pendingPayment.save();
+      }
+
+      return res.status(200).json({
+        success: true,
+
+        message:
+          "Payment already processed",
+
+        order: {
+          id:
+            existingPaymentOrder._id,
+
+          orderNumber:
+            existingPaymentOrder.orderNumber,
+
+          paymentStatus:
+            existingPaymentOrder.paymentStatus,
+
+          orderStatus:
+            existingPaymentOrder.orderStatus,
+
+          statusHistory:
+            existingPaymentOrder.statusHistory ||
+            [],
+        },
+      });
+    }
+
     // ---------------------------------------
+    // RAZORPAY ORDER ID ALREADY USED?
+    // ---------------------------------------
+
+    const existingOrder =
+      await Order.findOne({
+        razorpayOrderId:
+          razorpay_order_id,
+      });
+
+    if (existingOrder) {
+      if (
+        pendingPayment.status !==
+        "completed"
+      ) {
+        pendingPayment.status =
+          "completed";
+
+        await pendingPayment.save();
+      }
+
+      return res.status(200).json({
+        success: true,
+
+        message:
+          "Payment already processed",
+
+        order: {
+          id:
+            existingOrder._id,
+
+          orderNumber:
+            existingOrder.orderNumber,
+
+          paymentStatus:
+            existingOrder.paymentStatus,
+
+          orderStatus:
+            existingOrder.orderStatus,
+
+          statusHistory:
+            existingOrder.statusHistory ||
+            [],
+        },
+      });
+    }
+
+    // =======================================
+    // BUILD FINAL ITEMS
+    // =======================================
+
+    const finalOrderItems =
+      await buildFinalOrderItems(
+        pendingPayment.items
+      );
+
+    // =======================================
+    // CREATE REAL ORDER
+    // =======================================
+
+    const orderNumber =
+      createOrderNumber();
+
+    let order;
+
+    try {
+      order =
+        await Order.create({
+          orderNumber,
+
+          customer: {
+            name:
+              pendingPayment.customer.name,
+
+            email:
+              pendingPayment.customer.email,
+
+            phone:
+              pendingPayment.customer.phone,
+          },
+
+          shippingAddress: {
+            address:
+              pendingPayment
+                .shippingAddress
+                .address,
+
+            city:
+              pendingPayment
+                .shippingAddress
+                .city,
+
+            state:
+              pendingPayment
+                .shippingAddress
+                .state,
+
+            pincode:
+              pendingPayment
+                .shippingAddress
+                .pincode,
+          },
+
+          items:
+            finalOrderItems,
+
+          subtotal:
+            pendingPayment.subtotal,
+
+          shipping:
+            pendingPayment.shipping,
+
+          total:
+            pendingPayment.total,
+
+          paymentStatus:
+            "paid",
+
+          orderStatus:
+            "confirmed",
+
+          statusHistory: [
+            {
+              status:
+                "placed",
+
+              note:
+                "Order placed successfully",
+
+              changedAt:
+                new Date(),
+            },
+
+            {
+              status:
+                "confirmed",
+
+              note:
+                "Payment verified successfully",
+
+              changedAt:
+                new Date(),
+            },
+          ],
+
+          paymentMethod:
+            "razorpay",
+
+          razorpayOrderId:
+            razorpay_order_id,
+
+          razorpayPaymentId:
+            razorpay_payment_id,
+        });
+    } catch (error) {
+      // -------------------------------------
+      // DUPLICATE PAYMENT RACE PROTECTION
+      // -------------------------------------
+
+      if (
+        error &&
+        error.code === 11000
+      ) {
+        const duplicateOrder =
+          await Order.findOne({
+            $or: [
+              {
+                razorpayPaymentId:
+                  razorpay_payment_id,
+              },
+
+              {
+                razorpayOrderId:
+                  razorpay_order_id,
+              },
+            ],
+          });
+
+        if (duplicateOrder) {
+          if (
+            pendingPayment.status !==
+            "completed"
+          ) {
+            pendingPayment.status =
+              "completed";
+
+            await pendingPayment.save();
+          }
+
+          return res.status(200).json({
+            success: true,
+
+            message:
+              "Payment already processed",
+
+            order: {
+              id:
+                duplicateOrder._id,
+
+              orderNumber:
+                duplicateOrder.orderNumber,
+
+              paymentStatus:
+                duplicateOrder.paymentStatus,
+
+              orderStatus:
+                duplicateOrder.orderStatus,
+
+              statusHistory:
+                duplicateOrder.statusHistory ||
+                [],
+            },
+          });
+        }
+      }
+
+      throw error;
+    }
+
+    // =======================================
     // MARK PENDING PAYMENT COMPLETE
-    // ---------------------------------------
+    // =======================================
 
     pendingPayment.status =
       "completed";
 
     await pendingPayment.save();
 
-    // ---------------------------------------
+    // =======================================
     // RESPONSE
-    // ---------------------------------------
+    // =======================================
 
     return res.status(200).json({
       success: true,
@@ -498,7 +968,8 @@ const verifyPayment = async (req, res) => {
         "Payment verified successfully",
 
       order: {
-        id: order._id,
+        id:
+          order._id,
 
         orderNumber:
           order.orderNumber,
@@ -513,7 +984,6 @@ const verifyPayment = async (req, res) => {
           order.statusHistory || [],
       },
     });
-
   } catch (error) {
     console.error(
       "Payment verification error:",
@@ -522,35 +992,21 @@ const verifyPayment = async (req, res) => {
 
     return res.status(500).json({
       success: false,
+
       message:
         "Payment verification failed",
     });
   }
 };
 
+// =========================================
+// ADMIN — GET ALL ORDERS
+// =========================================
 
-
-/*
-|--------------------------------------------------------------------------
-| ADMIN — GET ALL ORDERS
-|--------------------------------------------------------------------------
-*/
-
-/*
-|--------------------------------------------------------------------------
-| ADMIN — GET ALL ORDERS
-| PAGINATED + SEARCH + STATUS FILTER
-|--------------------------------------------------------------------------
-*/
-
-/*
-|--------------------------------------------------------------------------
-| ADMIN — GET ALL ORDERS
-| PAGINATED + SEARCH + STATUS FILTER + GLOBAL STATISTICS
-|--------------------------------------------------------------------------
-*/
-
-const getAllOrders = async (req, res) => {
+const getAllOrders = async (
+  req,
+  res
+) => {
   try {
     const {
       page = 1,
@@ -559,9 +1015,9 @@ const getAllOrders = async (req, res) => {
       status = "all",
     } = req.query;
 
-    /* =========================================
-       PAGINATION
-    ========================================= */
+    // ---------------------------------------
+    // PAGINATION
+    // ---------------------------------------
 
     const currentPage = Math.max(
       Number(page) || 1,
@@ -569,100 +1025,98 @@ const getAllOrders = async (req, res) => {
     );
 
     const itemsPerPage = Math.min(
-      Math.max(Number(limit) || 10, 1),
+      Math.max(
+        Number(limit) || 10,
+        1
+      ),
       50
     );
 
     const skip =
-      (currentPage - 1) * itemsPerPage;
+      (currentPage - 1) *
+      itemsPerPage;
 
-
-    /* =========================================
-       FILTER
-    ========================================= */
+    // ---------------------------------------
+    // FILTER
+    // ---------------------------------------
 
     const filter = {};
 
-
-    /* =========================================
-       STATUS FILTER
-    ========================================= */
-
-    const allowedStatuses = [
-      "placed",
-      "confirmed",
-      "processing",
-      "shipped",
-      "delivered",
-      "cancelled",
-    ];
+    // ---------------------------------------
+    // STATUS FILTER
+    // ---------------------------------------
 
     if (
       status !== "all" &&
-      allowedStatuses.includes(status)
+      VALID_ORDER_STATUSES.includes(
+        status
+      )
     ) {
-      filter.orderStatus = status;
+      filter.orderStatus =
+        status;
     }
 
-
-    /* =========================================
-       SEARCH FILTER
-    ========================================= */
+    // ---------------------------------------
+    // SEARCH FILTER
+    // ---------------------------------------
 
     const cleanSearch =
       String(search).trim();
 
     if (cleanSearch) {
+      const safeSearch =
+        escapeRegex(cleanSearch);
+
       filter.$or = [
         {
           orderNumber: {
-            $regex: cleanSearch,
+            $regex: safeSearch,
             $options: "i",
           },
         },
 
         {
           "customer.name": {
-            $regex: cleanSearch,
+            $regex: safeSearch,
             $options: "i",
           },
         },
 
         {
           "customer.email": {
-            $regex: cleanSearch,
+            $regex: safeSearch,
             $options: "i",
           },
         },
 
         {
           "customer.phone": {
-            $regex: cleanSearch,
+            $regex: safeSearch,
             $options: "i",
           },
         },
 
         {
           paymentStatus: {
-            $regex: cleanSearch,
+            $regex: safeSearch,
             $options: "i",
           },
         },
       ];
     }
 
-
-    /* =========================================
-       TOTAL MATCHING ORDERS
-    ========================================= */
+    // ---------------------------------------
+    // TOTAL MATCHING ORDERS
+    // ---------------------------------------
 
     const totalOrders =
-      await Order.countDocuments(filter);
+      await Order.countDocuments(
+        filter
+      );
 
-
-    /* =========================================
-       PAGINATED ORDERS
-    ========================================= */
+    // ---------------------------------------
+    // PAGINATED ORDERS
+    // ---------------------------------------
 
     const orders =
       await Order.find(filter)
@@ -673,76 +1127,63 @@ const getAllOrders = async (req, res) => {
         .limit(itemsPerPage)
         .lean();
 
+    // ---------------------------------------
+    // GLOBAL STATISTICS
+    // ---------------------------------------
 
-    /* =========================================
-       GLOBAL DASHBOARD STATISTICS
-       
-       These are calculated from ALL orders,
-       not only the current page.
-    ========================================= */
+    const overallTotalOrders =
+      await Order.countDocuments();
 
-   /* =========================================
-   GLOBAL DASHBOARD STATISTICS
-========================================= */
-
-const overallTotalOrders =
-  await Order.countDocuments();
-
-const [
-  paidOrders,
-  pendingPayments,
-  revenueResult,
-] = await Promise.all([
-  Order.countDocuments({
-    paymentStatus: "paid",
-  }),
-
-  Order.countDocuments({
-    paymentStatus: "pending",
-  }),
-
-  Order.aggregate([
-    {
-      $match: {
+    const [
+      paidOrders,
+      pendingPayments,
+      revenueResult,
+    ] = await Promise.all([
+      Order.countDocuments({
         paymentStatus: "paid",
-      },
-    },
+      }),
 
-    {
-      $group: {
-        _id: null,
+      Order.countDocuments({
+        paymentStatus: "pending",
+      }),
 
-        total: {
-          $sum: "$total",
+      Order.aggregate([
+        {
+          $match: {
+            paymentStatus: "paid",
+          },
         },
-      },
-    },
-  ]),
-]);
 
+        {
+          $group: {
+            _id: null,
 
-const paidRevenue =
-  revenueResult.length > 0
-    ? revenueResult[0].total
-    : 0;
+            total: {
+              $sum: "$total",
+            },
+          },
+        },
+      ]),
+    ]);
 
-  
-     
+    const paidRevenue =
+      revenueResult.length > 0
+        ? revenueResult[0].total
+        : 0;
 
-
-    /* =========================================
-       PAGINATION INFORMATION
-    ========================================= */
+    // ---------------------------------------
+    // PAGINATION INFO
+    // ---------------------------------------
 
     const totalPages =
       Math.ceil(
-        totalOrders / itemsPerPage
+        totalOrders /
+          itemsPerPage
       );
 
-
-    /* =========================================
-       RESPONSE
-    ========================================= */
+    // ---------------------------------------
+    // RESPONSE
+    // ---------------------------------------
 
     return res.status(200).json({
       success: true,
@@ -750,11 +1191,15 @@ const paidRevenue =
       orders,
 
       statistics: {
-  totalOrders: overallTotalOrders,
-  paidOrders,
-  pendingPayments,
-  paidRevenue,
-},
+        totalOrders:
+          overallTotalOrders,
+
+        paidOrders,
+
+        pendingPayments,
+
+        paidRevenue,
+      },
 
       pagination: {
         currentPage,
@@ -766,15 +1211,14 @@ const paidRevenue =
         totalPages,
 
         hasNextPage:
-          currentPage < totalPages,
+          currentPage <
+          totalPages,
 
         hasPreviousPage:
           currentPage > 1,
       },
     });
-
   } catch (error) {
-
     console.error(
       "Get all orders error:",
       error
@@ -789,259 +1233,230 @@ const paidRevenue =
   }
 };
 
-/*
-|--------------------------------------------------------------------------
-| ADMIN — GET SINGLE ORDER
-|--------------------------------------------------------------------------
-*/
+// =========================================
+// ADMIN — GET SINGLE ORDER
+// =========================================
 
-const getAdminOrderByNumber = async (
-  req,
-  res
-) => {
-  try {
+const getAdminOrderByNumber =
+  async (req, res) => {
+    try {
+      const { orderNumber } =
+        req.params;
 
-    const { orderNumber } =
-      req.params;
+      const order =
+        await Order.findOne({
+          orderNumber,
+        }).lean();
 
+      if (!order) {
+        return res.status(404).json({
+          success: false,
 
-    const order = await Order.findOne({
-      orderNumber,
-    }).lean();
+          message:
+            "Order not found",
+        });
+      }
 
+      return res.status(200).json({
+        success: true,
 
-    if (!order) {
-      return res.status(404).json({
+        order,
+      });
+    } catch (error) {
+      console.error(
+        "Admin order details error:",
+        error
+      );
+
+      return res.status(500).json({
         success: false,
 
         message:
-          "Order not found",
+          "Failed to fetch order details",
       });
     }
-
-
-    return res.status(200).json({
-      success: true,
-
-      order,
-    });
-
-  } catch (error) {
-
-    console.error(
-      "Admin order details error:",
-      error
-    );
-
-    return res.status(500).json({
-      success: false,
-
-      message:
-        "Failed to fetch order details",
-    });
-  }
-};
-
+  };
 
 // =========================================
-// UPDATE ORDER STATUS - ADMIN
+// ADMIN — UPDATE ORDER STATUS
 // =========================================
 
-const updateOrderStatus = async (
-  req,
-  res
-) => {
-  try {
+const updateOrderStatus =
+  async (req, res) => {
+    try {
+      const { orderNumber } =
+        req.params;
 
-    const { orderNumber } =
-      req.params;
+      const { orderStatus, note } =
+        req.body;
 
-    const { orderStatus, note } =
-      req.body;
+      // -------------------------------------
+      // VALIDATE STATUS
+      // -------------------------------------
 
+      if (
+        !VALID_ORDER_STATUSES.includes(
+          orderStatus
+        )
+      ) {
+        return res.status(400).json({
+          success: false,
 
-    // ---------------------------------------
-    // ALLOWED STATUSES
-    // ---------------------------------------
+          message:
+            "Invalid order status",
+        });
+      }
 
-    const allowedStatuses = [
-      "placed",
-      "confirmed",
-      "processing",
-      "shipped",
-      "delivered",
-      "cancelled",
-    ];
+      // -------------------------------------
+      // FIND ORDER
+      // -------------------------------------
 
+      const order =
+        await Order.findOne({
+          orderNumber,
+        });
 
-    if (
-      !allowedStatuses.includes(
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+
+          message:
+            "Order not found",
+        });
+      }
+
+      // -------------------------------------
+      // SAME STATUS
+      // -------------------------------------
+
+      if (
+        order.orderStatus ===
         orderStatus
-      )
-    ) {
-      return res.status(400).json({
+      ) {
+        return res.status(400).json({
+          success: false,
+
+          message:
+            "Order is already in this status",
+        });
+      }
+
+      // -------------------------------------
+      // UPDATE STATUS
+      // -------------------------------------
+
+      order.orderStatus =
+        orderStatus;
+
+      // -------------------------------------
+      // STATUS HISTORY
+      // -------------------------------------
+
+      order.statusHistory =
+        order.statusHistory || [];
+
+      order.statusHistory.push({
+        status: orderStatus,
+
+        note:
+          note ||
+          `Order status changed to ${orderStatus}`,
+
+        changedAt:
+          new Date(),
+      });
+
+      // -------------------------------------
+      // SAVE
+      // -------------------------------------
+
+      await order.save();
+
+      // -------------------------------------
+      // RESPONSE
+      // -------------------------------------
+
+      return res.status(200).json({
+        success: true,
+
+        message:
+          "Order status updated",
+
+        order: {
+          orderNumber:
+            order.orderNumber,
+
+          orderStatus:
+            order.orderStatus,
+
+          paymentStatus:
+            order.paymentStatus,
+
+          statusHistory:
+            order.statusHistory || [],
+        },
+      });
+    } catch (error) {
+      console.error(
+        "Update order status error:",
+        error
+      );
+
+      return res.status(500).json({
         success: false,
 
         message:
-          "Invalid order status",
+          "Failed to update order status",
       });
     }
-
-
-    // ---------------------------------------
-    // FIND ORDER
-    // ---------------------------------------
-
-    const order = await Order.findOne({
-      orderNumber,
-    });
-
-
-    if (!order) {
-      return res.status(404).json({
-        success: false,
-
-        message:
-          "Order not found",
-      });
-    }
-
-
-    // ---------------------------------------
-    // CHECK IF STATUS IS ALREADY SAME
-    // ---------------------------------------
-
-    if (
-      order.orderStatus ===
-      orderStatus
-    ) {
-      return res.status(400).json({
-        success: false,
-
-        message:
-          "Order is already in this status",
-      });
-    }
-
-
-    // ---------------------------------------
-    // UPDATE STATUS
-    // ---------------------------------------
-
-    order.orderStatus =
-      orderStatus;
-
-
-    // ---------------------------------------
-    // ADD STATUS HISTORY
-    // ---------------------------------------
-
-    order.statusHistory =
-      order.statusHistory || [];
-
-
-    order.statusHistory.push({
-      status: orderStatus,
-
-      note:
-        note ||
-        `Order status changed to ${orderStatus}`,
-
-      changedAt:
-        new Date(),
-    });
-
-
-    // ---------------------------------------
-    // SAVE ORDER
-    // ---------------------------------------
-
-    await order.save();
-
-
-    // ---------------------------------------
-    // RESPONSE
-    // ---------------------------------------
-
-    return res.status(200).json({
-      success: true,
-
-      message:
-        "Order status updated",
-
-      order: {
-        orderNumber:
-          order.orderNumber,
-
-        orderStatus:
-          order.orderStatus,
-
-        paymentStatus:
-          order.paymentStatus,
-
-        statusHistory:
-          order.statusHistory || [],
-      },
-    });
-
-  } catch (error) {
-
-    console.error(
-      "Update order status error:",
-      error
-    );
-
-    return res.status(500).json({
-      success: false,
-
-      message:
-        "Failed to update order status",
-    });
-  }
-};
+  };
 
 // =========================================
 // CUSTOMER — TRACK ORDER
 // =========================================
 
-const trackOrder = async (req, res) => {
+const trackOrder = async (
+  req,
+  res
+) => {
   try {
     const {
       orderNumber,
       email,
     } = req.body;
 
-
     // ---------------------------------------
     // VALIDATION
     // ---------------------------------------
 
-    if (!orderNumber || !email) {
+    if (
+      !orderNumber ||
+      !email
+    ) {
       return res.status(400).json({
         success: false,
+
         message:
           "Order number and email are required",
       });
     }
 
-
     // ---------------------------------------
     // FIND ORDER
     // ---------------------------------------
 
-    const order = await Order.findOne({
-      orderNumber: String(
-        orderNumber
-      )
-        .trim()
-        .toUpperCase(),
+    const order =
+      await Order.findOne({
+        orderNumber:
+          String(orderNumber)
+            .trim()
+            .toUpperCase(),
 
-      "customer.email":
-        String(email)
-          .trim()
-          .toLowerCase(),
-    }).lean();
-
+        "customer.email":
+          String(email)
+            .trim()
+            .toLowerCase(),
+      }).lean();
 
     // ---------------------------------------
     // DON'T REVEAL WHICH FIELD FAILED
@@ -1050,14 +1465,14 @@ const trackOrder = async (req, res) => {
     if (!order) {
       return res.status(404).json({
         success: false,
+
         message:
           "Order number or email is incorrect",
       });
     }
 
-
     // ---------------------------------------
-    // RETURN LIMITED CUSTOMER DATA
+    // LIMITED CUSTOMER RESPONSE
     // ---------------------------------------
 
     return res.status(200).json({
@@ -1100,9 +1515,7 @@ const trackOrder = async (req, res) => {
           order.createdAt,
       },
     });
-
   } catch (error) {
-
     console.error(
       "Track order error:",
       error
@@ -1110,12 +1523,12 @@ const trackOrder = async (req, res) => {
 
     return res.status(500).json({
       success: false,
+
       message:
         "Unable to track order",
     });
   }
 };
-
 
 // =========================================
 // EXPORTS
