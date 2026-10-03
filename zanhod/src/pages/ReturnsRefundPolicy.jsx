@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import "../styles/policy.css";
+import Navbar from "../components/Navbar"
 
 function ReturnsRefundPolicy() {
   return (
+  <div className="site">
+        <Navbar />
     <main className="policy-page">
       <section className="policy-hero">
         <p className="policy-eyebrow">ZANHOD / RETURNS</p>
@@ -143,6 +146,7 @@ function ReturnsRefundPolicy() {
         </article>
       </section>
     </main>
+    </div>
   );
 }
 
