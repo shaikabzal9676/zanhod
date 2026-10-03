@@ -102,7 +102,7 @@ function Footer() {
 
           <Link to="/about">About ZANHOD</Link>
           <Link to="/journal">Journal</Link>
-          <Link to="/size-guide">Size Guide</Link>
+  
         </div>
 
         {/* SUPPORT */}
