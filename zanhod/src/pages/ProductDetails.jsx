@@ -4,6 +4,7 @@ import {
   Minus,
   Plus,
   ShoppingBag,
+  ArrowRight,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -23,8 +24,36 @@ function ProductDetails() {
     (item) => String(item.id) === String(id)
   );
 
+
+  /* =========================================
+     PRODUCT IMAGES
+  ========================================= */
+
+  const productImages =
+    product?.images && product.images.length > 0
+      ? product.images.slice(0, 4)
+      : product?.image
+        ? [product.image]
+        : [];
+
+
+  /* =========================================
+     STATES
+  ========================================= */
+
+  const [activeImage, setActiveImage] = useState(
+    productImages[0] || ""
+  );
+
   const [selectedSize, setSelectedSize] = useState("");
+
   const [quantity, setQuantity] = useState(1);
+
+  const [cartMessage, setCartMessage] = useState("");
+
+  const [cartMessageType, setCartMessageType] =
+    useState("success");
+
 
   const { addToCart } = useCart();
 
@@ -48,6 +77,28 @@ function ProductDetails() {
     );
 
   }
+
+
+  /* =========================================
+     SHOW CART MESSAGE
+  ========================================= */
+
+  const showCartMessage = (
+    message,
+    type = "success"
+  ) => {
+
+    setCartMessage(message);
+
+    setCartMessageType(type);
+
+    setTimeout(() => {
+
+      setCartMessage("");
+
+    }, 3000);
+
+  };
 
 
   /* =========================================
@@ -76,19 +127,40 @@ function ProductDetails() {
 
   const handleAddToCart = () => {
 
+    /* ---------------------------------------
+       SIZE VALIDATION
+    --------------------------------------- */
+
     if (!selectedSize) {
 
-      alert("Please select a size.");
+      showCartMessage(
+        "Please select a size.",
+        "error"
+      );
 
       return;
 
     }
 
 
+    /* ---------------------------------------
+       ADD PRODUCT
+    --------------------------------------- */
+
     addToCart(
       product,
       selectedSize,
       quantity
+    );
+
+
+    /* ---------------------------------------
+       SUCCESS MESSAGE
+    --------------------------------------- */
+
+    showCartMessage(
+      `${product.name} · Size ${selectedSize} · Qty ${quantity}`,
+      "success"
     );
 
   };
@@ -99,6 +171,7 @@ function ProductDetails() {
     <div className="site">
 
       <Navbar />
+
 
       <main className="product-details-page">
 
@@ -128,41 +201,109 @@ function ProductDetails() {
 
 
           {/* ===================================
-              IMAGE
+              IMAGE GALLERY
           =================================== */}
 
-          <div className="product-details-image">
+          <div className="product-details-image-gallery">
 
-            <img
-              src={product.image}
-              alt={`${product.name} ZANHOD hoodie`}
-            />
 
-            <div className="details-image-number">
-              {product.id}
+            {/* =================================
+                MAIN IMAGE
+            ================================= */}
+
+            <div className="product-details-image">
+
+              <img
+                src={activeImage}
+                alt={`${product.name} ZANHOD hoodie`}
+              />
+
+              <div className="details-image-number">
+
+                {String(product.id).padStart(3, "0")}
+
+              </div>
+
             </div>
+
+
+            {/* =================================
+                THUMBNAILS
+            ================================= */}
+
+            {productImages.length > 0 && (
+
+              <div className="product-image-thumbnails">
+
+                {productImages.map(
+                  (image, index) => (
+
+                    <button
+                      key={`${image}-${index}`}
+                      type="button"
+                      className={
+                        activeImage === image
+                          ? "product-thumbnail active"
+                          : "product-thumbnail"
+                      }
+                      onClick={() =>
+                        setActiveImage(image)
+                      }
+                      aria-label={`View product image ${
+                        index + 1
+                      }`}
+                    >
+
+                      <img
+                        src={image}
+                        alt={`${product.name} view ${
+                          index + 1
+                        }`}
+                      />
+
+                    </button>
+
+                  )
+                )}
+
+              </div>
+
+            )}
 
           </div>
 
 
           {/* ===================================
-              CONTENT
+              PRODUCT CONTENT
           =================================== */}
 
           <div className="product-details-content">
 
 
+            {/* =================================
+                EYEBROW
+            ================================= */}
+
             <p className="details-eyebrow">
 
-              ZANHOD / DROP 01 / {product.id}
+              ZANHOD / DROP 01 /{" "}
+              {String(product.id).padStart(3, "0")}
 
             </p>
 
+
+            {/* =================================
+                TITLE
+            ================================= */}
 
             <h1>
               {product.name}
             </h1>
 
+
+            {/* =================================
+                DESCRIPTION
+            ================================= */}
 
             <p className="details-description">
 
@@ -170,6 +311,10 @@ function ProductDetails() {
 
             </p>
 
+
+            {/* =================================
+                PRICE
+            ================================= */}
 
             <div className="details-price">
 
@@ -217,7 +362,9 @@ function ProductDetails() {
                         setSelectedSize(size)
                       }
                     >
+
                       {size}
+
                     </button>
 
                   )
@@ -246,7 +393,9 @@ function ProductDetails() {
                   onClick={decreaseQuantity}
                   aria-label="Decrease quantity"
                 >
+
                   <Minus size={15} />
+
                 </button>
 
 
@@ -260,7 +409,9 @@ function ProductDetails() {
                   onClick={increaseQuantity}
                   aria-label="Increase quantity"
                 >
+
                   <Plus size={15} />
+
                 </button>
 
               </div>
@@ -293,7 +444,9 @@ function ProductDetails() {
               type="button"
               className="buy-now-button"
             >
+
               BUY NOW
+
             </button>
 
 
@@ -363,6 +516,77 @@ function ProductDetails() {
         </section>
 
       </main>
+
+
+      {/* =========================================
+          CART TOAST
+      ========================================= */}
+
+      {cartMessage && (
+
+        <div
+          className={
+            cartMessageType === "success"
+              ? "cart-toast"
+              : "cart-toast error"
+          }
+        >
+
+
+          {/* ICON */}
+
+          <div className="cart-toast-icon">
+
+            {cartMessageType === "success"
+              ? "✓"
+              : "!"}
+
+          </div>
+
+
+          {/* MESSAGE */}
+
+          <div className="cart-toast-content">
+
+            <strong>
+
+              {cartMessageType === "success"
+                ? "ADDED TO CART"
+                : "SELECT A SIZE"}
+
+            </strong>
+
+
+            <span>
+
+              {cartMessage}
+
+            </span>
+
+
+            {/* VIEW CART */}
+
+            {cartMessageType === "success" && (
+
+              <Link
+                to="/cart"
+                className="cart-toast-link"
+              >
+
+                VIEW CART
+
+                <ArrowRight size={13} />
+
+              </Link>
+
+            )}
+
+          </div>
+
+
+        </div>
+
+      )}
 
     </div>
 
