@@ -4,7 +4,13 @@ const products = [
     name: "THE VOID",
     description: "Minimal. Timeless.",
     price: 2499,
-    image: "/products/hoodie_product_1.jpg",
+    image: "/products/Tiger_1.jpg",
+    images: [
+    "/products/Tiger_1.jpg",
+    "/products/Tiger_2.jpg",
+    "/products/Tiger_3.jpg",
+    "/products/Tiger_4.jpg"
+  ]
   },
   {
     id: "002",
