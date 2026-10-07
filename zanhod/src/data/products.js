@@ -1,8 +1,8 @@
 const products = [
   {
     id: "001",
-    name: "THE VOID",
-    description: "Minimal. Timeless.",
+    name: "ZANHOD Rising Tiger Hoodie",
+    description: "Midnight Climb.",
     price: 2499,
     image: "/products/Tiger_1.png",
     images: [
