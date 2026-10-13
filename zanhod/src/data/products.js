@@ -23,7 +23,7 @@ const products = [
     "/products/Celestial_gold_2.png",
     "/products/Celestial_gold_3.png",
     "/products/Celestial_gold_4.png"
-  ],
+  ]
   },
   
   {
