@@ -147,7 +147,7 @@
     Contain is better for generated hoodie
     product images because it prevents cropping.
   */
-  object-fit: cover;
+  object-fit: contain;
 
   transition:
     transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
