@@ -14,17 +14,30 @@ const products = [
   },
   {
     id: "002",
-    name: "AFTER DARK",
+    name: "Celestial Gold",
     description: "Bold. Unforgiving.",
     price: 2699,
-    image: "/products/hoodie_product_2.jpg",
+    image: "/products/Celestial_gold_1.png",
+     images: [
+    "/products/Celestial_gold_1.png",
+    "/products/Celestial_gold_2.png",
+    "/products/Celestial_gold_3.png",
+    "/products/Celestial_gold_4.png"
+  ]
   },
+  
   {
     id: "003",
     name: "NORTH",
     description: "Cold. Focused.",
     price: 2599,
-    image: "/products/hoodie_product_3.jpg",
+    image: "/product/Tiger_1.png",
+    images: [
+    "/products/Tiger_1.png",
+    "/products/Tiger_2.png",
+    "/products/Tiger_3.png",
+    "/products/Tiger_4.png"
+  ]
   },
   {
     id: "004",
