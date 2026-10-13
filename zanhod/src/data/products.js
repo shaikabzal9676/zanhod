@@ -4,7 +4,7 @@ const products = [
     name: "ZANHOD Rising Tiger Hoodie",
     description: "Midnight Climb.",
     price: 2499,
-    image: "/products/Tiger_1.png",
+    image: "/products/Tiger_2.png",
     images: [
     "/products/Tiger_1.png",
     "/products/Tiger_2.png",
