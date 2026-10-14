@@ -31,7 +31,7 @@ const products = [
     name: "ZANHOD Men's Crimson Mountain Embroidered Hoodie",
     description: "Where Silence Rises.",
     price: 2599,
-    image: "/product/Crimson_mountain_1.png",
+    image: "/products/Crimson_mountain_1.png",
     images: [
     "/products/Crimson_mountain_1.png",
     "/products/Crimson_mountain_2.png",
