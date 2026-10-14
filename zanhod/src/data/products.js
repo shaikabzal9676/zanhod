@@ -1,7 +1,7 @@
 const products = [
   {
     id: "001",
-    name: "ZANHOD Rising Tiger Hoodie",
+    name: "ZANHOD Men's Black Tiger Graphic Puff Print Hoodie",
     description: "Midnight Climb.",
     price: 2499,
     image: "/products/Tiger_2.png",
@@ -14,8 +14,8 @@ const products = [
   },
   {
     id: "002",
-    name: "Celestial Gold",
-    description: "Bold. Unforgiving.",
+    name: "ZANHOD Men's Black Mountain Embroidered Hoodie",
+    description: "Quietly Distinct.",
     price: 2699,
     image: "/products/Celestial_gold_1.png",
      images: [
@@ -28,15 +28,14 @@ const products = [
   
   {
     id: "003",
-    name: "NORTH",
-    description: "Cold. Focused.",
+    name: "ZANHOD Men's Crimson Mountain Embroidered Hoodie",
+    description: "Where Silence Rises.",
     price: 2599,
-    image: "/product/Tiger_1.png",
+    image: "/product/Crimson_mountain_1.png",
     images: [
-    "/products/Tiger_1.png",
-    "/products/Tiger_2.png",
-    "/products/Tiger_3.png",
-    "/products/Tiger_4.png"
+    "/products/Crimson_mountain_1.png",
+    "/products/Crimson_mountain_2.png",
+    "/products/Crimson_mountain_3.png",
   ]
   },
   {
