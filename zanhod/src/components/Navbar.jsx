@@ -57,7 +57,6 @@ function Navbar() {
   <Link to="/shop">SHOP</Link>
   <Link to="/drop-01">DROP 01</Link>
   <Link to="/about">ABOUT</Link>
-  <Link to="/journal">JOURNAL</Link>
   <Link to="/track-order">TRACK ORDER</Link>
 </nav>
 
