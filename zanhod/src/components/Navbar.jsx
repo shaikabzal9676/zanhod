@@ -128,12 +128,7 @@ function Navbar() {
     ABOUT
   </Link>
 
-  <Link
-    to="/journal"
-    onClick={() => setMenuOpen(false)}
-  >
-    JOURNAL
-  </Link>
+ 
 
   <Link
     to="/track-order"
