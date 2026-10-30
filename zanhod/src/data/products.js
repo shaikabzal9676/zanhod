@@ -4,12 +4,12 @@ const products = [
     name: "ZANHOD Men's Black Tiger Graphic Puff Print Hoodie",
     description: "Midnight Climb.",
     price: 2499,
-    image: "/products/Tiger_2.png",
+    image: "/products/hoodie_product_1.png",
     images: [
-    "/products/Tiger_1.png",
-    "/products/Tiger_2.png",
-    "/products/Tiger_3.png",
-    "/products/Tiger_4.png"
+    "/products/hoodie_product_1.png",
+    "/products/hoodie_product_1_2.png",
+    "/products/hoodie_product_1_3.png",
+    "/products/hoodie_product_1_4.png"
   ]
   },
   {
@@ -17,12 +17,11 @@ const products = [
     name: "ZANHOD Men's Black Mountain Embroidered Hoodie",
     description: "Quietly Distinct.",
     price: 2699,
-    image: "/products/Celestial_gold_1.png",
+    image: "/products/hoodie_product_2.png",
      images: [
-    "/products/Celestial_gold_1.png",
-    "/products/Celestial_gold_2.png",
-    "/products/Celestial_gold_3.png",
-    "/products/Celestial_gold_4.png"
+    "/products/Crimson_mountain_1.png",
+    "/products/Crimson_mountain_2.png",
+    "/products/Crimson_mountain_3.png",
   ]
   },
   
@@ -31,7 +30,7 @@ const products = [
     name: "ZANHOD Men's Crimson Mountain Embroidered Hoodie",
     description: "Where Silence Rises.",
     price: 2599,
-    image: "/products/Crimson_mountain_1.png",
+    image: "/products/hoodie_product_3.png",
     images: [
     "/products/Crimson_mountain_1.png",
     "/products/Crimson_mountain_2.png",
@@ -43,21 +42,13 @@ const products = [
     name: "REBEL",
     description: "Defy. Create.",
     price: 2699,
-    image: "/products/hoodie_product_1.png",
-  },
-  {
-    id: "005",
-    name: "NOIR",
-    description: "Pure. Essential.",
-    price: 2499,
-    image: "/products/hoodie_product_5.jpg",
-  },
-  {
-    id: "006",
-    name: "ORIGIN",
-    description: "Where it began.",
-    price: 2799,
-    image: "/products/hoodie_product_6.jpg",
+    image: "/products/hoodie_product_4.png",
+    images:[
+      "/products/hoodie_product_4.png",
+    "/products/Celestial_gold_2.png",
+    "/products/Celestial_gold_3.png",
+    "/products/Celestial_gold_4.png"
+      ]
   },
 ];
 
