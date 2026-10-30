@@ -356,13 +356,16 @@ img {
 ========================================= */
 
 @media (max-width: 768px) {
+   .navbar{
+      margin-top: -30px;
+    padding-top: 30px;
+    padding-bottom: 20px;
+   }
 
   .navbar-inner {
     height: 68px;
 
     padding: 0 var(--padding-mobile);
-     margin-top: -20px;
-     padding-top: 19px;
   }
 
 
