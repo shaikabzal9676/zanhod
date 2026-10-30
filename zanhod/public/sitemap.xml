@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 
 <urlset
@@ -5,15 +6,9 @@
 >
 
   <url>
-    <loc>https://www.zanhod.in/</loc>
+    <loc>https://zanhod.in/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-  </url>
-
-  <url>
-    <loc>https://www.zanhod.in/track-order</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.4</priority>
   </url>
 
 </urlset>
