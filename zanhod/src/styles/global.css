@@ -359,7 +359,7 @@ img {
    .navbar{
       margin-top: -30px;
     padding-top: 30px;
-    padding-bottom: 20px;
+   
    }
 
   .navbar-inner {
@@ -380,6 +380,7 @@ img {
 
   .cart-count{
     right:10px;
+     top:40px;
   }
 
 
