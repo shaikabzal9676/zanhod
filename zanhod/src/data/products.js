@@ -32,9 +32,9 @@ const products = [
     price: 1199,
     image: "/products/hoodie_product_3.png",
     images: [
-    "/products/Crimson_mountain_1.png",
-    "/products/Crimson_mountain_2.png",
-    "/products/Crimson_mountain_3.png",
+    "/products/Tiger_1.png",
+    "/products/Tiger_3.png",
+    "/products/Tiger_4.png",
   ]
   },
   
