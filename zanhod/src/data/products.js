@@ -43,7 +43,7 @@ const products = [
     name: "REBEL",
     description: "Defy. Create.",
     price: 2699,
-    image: "/products/hoodie_product_4.jpg",
+    image: "/products/hoodie_product_1.png",
   },
   {
     id: "005",
