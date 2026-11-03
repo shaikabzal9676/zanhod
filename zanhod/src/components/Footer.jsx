@@ -132,7 +132,7 @@ function Footer() {
           <p className="footer-column-title">FOLLOW</p>
 
           <a
-  href="https://instagram.com/"
+  href="https://www.instagram.com/zanhod/"
   target="_blank"
   rel="noreferrer"
 >
