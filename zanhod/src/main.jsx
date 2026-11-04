@@ -1,6 +1,8 @@
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 
 import App from "./App";
 import "./styles/global.css";
@@ -10,12 +12,14 @@ import { AdminAuthProvider } from "./context/AdminAuthContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <CartProvider>
-        <AdminAuthProvider>
-          <App />
-        </AdminAuthProvider>
-      </CartProvider>
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <CartProvider>
+          <AdminAuthProvider>
+            <App />
+          </AdminAuthProvider>
+        </CartProvider>
+      </BrowserRouter>
+    </HelmetProvider>
   </React.StrictMode>
 );
