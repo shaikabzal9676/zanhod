@@ -1,39 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- Homepage -->
   <url>
     <loc>https://zanhod.in/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
   </url>
 
-  <!-- Shop -->
   <url>
     <loc>https://zanhod.in/shop</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
   </url>
 
-  <!-- Drop 01 -->
   <url>
     <loc>https://zanhod.in/drop-01</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
   </url>
 
-  <!-- About -->
   <url>
     <loc>https://zanhod.in/about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
   </url>
 
-  <!-- Contact -->
   <url>
     <loc>https://zanhod.in/contact</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://zanhod.in/shipping-policy</loc>
+  </url>
+
+  <url>
+    <loc>https://zanhod.in/returns-refund-policy</loc>
+  </url>
+
+  <url>
+    <loc>https://zanhod.in/privacy-policy</loc>
+  </url>
+
+  <url>
+    <loc>https://zanhod.in/terms-and-conditions</loc>
   </url>
 
 </urlset>
