@@ -1,3 +1,4 @@
+
 import { useParams, Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -7,6 +8,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 
 import Navbar from "../components/Navbar";
 import products from "../data/products";
@@ -15,15 +17,12 @@ import { useCart } from "../context/CartContext";
 
 import "../styles/product-details.css";
 
-
 function ProductDetails() {
-
   const { id } = useParams();
 
   const product = products.find(
     (item) => String(item.id) === String(id)
   );
-
 
   /* =========================================
      PRODUCT IMAGES
@@ -35,7 +34,6 @@ function ProductDetails() {
       : product?.image
         ? [product.image]
         : [];
-
 
   /* =========================================
      STATES
@@ -54,30 +52,50 @@ function ProductDetails() {
   const [cartMessageType, setCartMessageType] =
     useState("success");
 
-
   const { addToCart } = useCart();
-
 
   /* =========================================
      PRODUCT NOT FOUND
   ========================================= */
 
   if (!product) {
-
     return (
-      <div className="product-not-found">
+      <>
+        <Helmet>
+          <title>Product Not Found | ZANHOD</title>
 
-        <h1>PRODUCT NOT FOUND</h1>
+          <meta
+            name="robots"
+            content="noindex, follow"
+          />
+        </Helmet>
 
-        <Link to="/">
-          RETURN HOME
-        </Link>
+        <div className="product-not-found">
+          <h1>PRODUCT NOT FOUND</h1>
 
-      </div>
+          <Link to="/">
+            RETURN HOME
+          </Link>
+        </div>
+      </>
     );
-
   }
 
+  /* =========================================
+     PRODUCT SEO
+  ========================================= */
+
+  const productUrl = `https://zanhod.in/product/${product.id}`;
+
+  const seoTitle = `${product.name} | ZANHOD Premium Hoodie`;
+
+  const seoDescription = (
+    product.description ||
+    `${product.name} — discover the ZANHOD Drop 01 streetwear hoodie.`
+  ).slice(0, 160);
+
+  const productImage =
+    product.image || productImages[0] || "";
 
   /* =========================================
      SHOW CART MESSAGE
@@ -87,61 +105,46 @@ function ProductDetails() {
     message,
     type = "success"
   ) => {
-
     setCartMessage(message);
 
     setCartMessageType(type);
 
     setTimeout(() => {
-
       setCartMessage("");
-
     }, 3000);
-
   };
-
 
   /* =========================================
      QUANTITY
   ========================================= */
 
   const increaseQuantity = () => {
-
     setQuantity((prev) => prev + 1);
-
   };
 
-
   const decreaseQuantity = () => {
-
     setQuantity((prev) =>
       prev > 1 ? prev - 1 : 1
     );
-
   };
-
 
   /* =========================================
      ADD TO CART
   ========================================= */
 
   const handleAddToCart = () => {
-
     /* ---------------------------------------
        SIZE VALIDATION
     --------------------------------------- */
 
     if (!selectedSize) {
-
       showCartMessage(
         "Please select a size.",
         "error"
       );
 
       return;
-
     }
-
 
     /* ---------------------------------------
        ADD PRODUCT
@@ -153,7 +156,6 @@ function ProductDetails() {
       quantity
     );
 
-
     /* ---------------------------------------
        SUCCESS MESSAGE
     --------------------------------------- */
@@ -162,19 +164,103 @@ function ProductDetails() {
       `${product.name} · Size ${selectedSize} · Qty ${quantity}`,
       "success"
     );
-
   };
 
-
   return (
-
     <div className="site">
+
+      {/* =====================================
+          DYNAMIC PRODUCT SEO
+      ===================================== */}
+
+      <Helmet>
+        <title>{seoTitle}</title>
+
+        <meta
+          name="description"
+          content={seoDescription}
+        />
+
+        <meta
+          name="robots"
+          content="index, follow"
+        />
+
+        <link
+          rel="canonical"
+          href={productUrl}
+        />
+
+        {/* Open Graph */}
+
+        <meta
+          property="og:type"
+          content="product"
+        />
+
+        <meta
+          property="og:title"
+          content={seoTitle}
+        />
+
+        <meta
+          property="og:description"
+          content={seoDescription}
+        />
+
+        <meta
+          property="og:url"
+          content={productUrl}
+        />
+
+        <meta
+          property="og:site_name"
+          content="ZANHOD"
+        />
+
+        {productImage && (
+          <meta
+            property="og:image"
+            content={
+              productImage.startsWith("http")
+                ? productImage
+                : `https://zanhod.in${productImage.startsWith("/") ? "" : "/"}${productImage}`
+            }
+          />
+        )}
+
+        {/* Twitter / X */}
+
+        <meta
+          name="twitter:card"
+          content="summary_large_image"
+        />
+
+        <meta
+          name="twitter:title"
+          content={seoTitle}
+        />
+
+        <meta
+          name="twitter:description"
+          content={seoDescription}
+        />
+
+        {productImage && (
+          <meta
+            name="twitter:image"
+            content={
+              productImage.startsWith("http")
+                ? productImage
+                : `https://zanhod.in${productImage.startsWith("/") ? "" : "/"}${productImage}`
+            }
+          />
+        )}
+      </Helmet>
 
       <Navbar />
 
-
       <main className="product-details-page">
-
 
         {/* =====================================
             BACK
@@ -192,20 +278,17 @@ function ProductDetails() {
 
         </div>
 
-
         {/* =====================================
             PRODUCT
         ===================================== */}
 
         <section className="product-details">
 
-
           {/* ===================================
               IMAGE GALLERY
           =================================== */}
 
           <div className="product-details-image-gallery">
-
 
             {/* =================================
                 MAIN IMAGE
@@ -215,7 +298,7 @@ function ProductDetails() {
 
               <img
                 src={activeImage}
-                alt={`${product.name} ZANHOD hoodie`}
+                alt={`${product.name} premium ZANHOD streetwear hoodie`}
               />
 
               <div className="details-image-number">
@@ -225,7 +308,6 @@ function ProductDetails() {
               </div>
 
             </div>
-
 
             {/* =================================
                 THUMBNAILS
@@ -256,7 +338,7 @@ function ProductDetails() {
 
                       <img
                         src={image}
-                        alt={`${product.name} view ${
+                        alt={`${product.name} product view ${
                           index + 1
                         }`}
                       />
@@ -272,13 +354,11 @@ function ProductDetails() {
 
           </div>
 
-
           {/* ===================================
               PRODUCT CONTENT
           =================================== */}
 
           <div className="product-details-content">
-
 
             {/* =================================
                 EYEBROW
@@ -291,7 +371,6 @@ function ProductDetails() {
 
             </p>
 
-
             {/* =================================
                 TITLE
             ================================= */}
@@ -299,7 +378,6 @@ function ProductDetails() {
             <h1>
               {product.name}
             </h1>
-
 
             {/* =================================
                 DESCRIPTION
@@ -311,7 +389,6 @@ function ProductDetails() {
 
             </p>
 
-
             {/* =================================
                 PRICE
             ================================= */}
@@ -322,9 +399,7 @@ function ProductDetails() {
 
             </div>
 
-
             <div className="details-line"></div>
-
 
             {/* =================================
                 SIZE
@@ -343,7 +418,6 @@ function ProductDetails() {
                 </span>
 
               </div>
-
 
               <div className="size-options">
 
@@ -374,7 +448,6 @@ function ProductDetails() {
 
             </div>
 
-
             {/* =================================
                 QUANTITY
             ================================= */}
@@ -384,7 +457,6 @@ function ProductDetails() {
               <span>
                 QUANTITY
               </span>
-
 
               <div className="quantity-control">
 
@@ -398,11 +470,9 @@ function ProductDetails() {
 
                 </button>
 
-
                 <span>
                   {quantity}
                 </span>
-
 
                 <button
                   type="button"
@@ -417,7 +487,6 @@ function ProductDetails() {
               </div>
 
             </div>
-
 
             {/* =================================
                 ADD TO CART
@@ -435,7 +504,6 @@ function ProductDetails() {
 
             </button>
 
-
             {/* =================================
                 BUY NOW
             ================================= */}
@@ -449,13 +517,11 @@ function ProductDetails() {
 
             </button>
 
-
             {/* =================================
                 PRODUCT INFO
             ================================= */}
 
             <div className="product-info-list">
-
 
               <div className="info-item">
 
@@ -469,7 +535,6 @@ function ProductDetails() {
 
               </div>
 
-
               <div className="info-item">
 
                 <span>
@@ -481,7 +546,6 @@ function ProductDetails() {
                 </p>
 
               </div>
-
 
               <div className="info-item">
 
@@ -495,7 +559,6 @@ function ProductDetails() {
 
               </div>
 
-
               <div className="info-item">
 
                 <span>
@@ -508,7 +571,6 @@ function ProductDetails() {
 
               </div>
 
-
             </div>
 
           </div>
@@ -516,7 +578,6 @@ function ProductDetails() {
         </section>
 
       </main>
-
 
       {/* =========================================
           CART TOAST
@@ -532,7 +593,6 @@ function ProductDetails() {
           }
         >
 
-
           {/* ICON */}
 
           <div className="cart-toast-icon">
@@ -542,7 +602,6 @@ function ProductDetails() {
               : "!"}
 
           </div>
-
 
           {/* MESSAGE */}
 
@@ -556,13 +615,11 @@ function ProductDetails() {
 
             </strong>
 
-
             <span>
 
               {cartMessage}
 
             </span>
-
 
             {/* VIEW CART */}
 
@@ -583,16 +640,12 @@ function ProductDetails() {
 
           </div>
 
-
         </div>
 
       )}
 
     </div>
-
   );
-
 }
-
 
 export default ProductDetails;
